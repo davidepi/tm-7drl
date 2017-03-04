@@ -1,0 +1,37 @@
+const WATER = new Tile(true,32,96);
+const WOOD = new Tile(true,0,96);
+const TLCORNER = new Tile(false,160,32);
+const BLCORNER = new Tile(false,160,64);
+const TRCORNER = new Tile(false,128,64);
+const BRCORNER = new Tile(false,192,64);
+const HWALL = new Tile(false,32,64);
+const VWALL = new Tile(false,0,64);
+const TDOWN = new Tile(false,64,32);
+const TUP = new Tile(false,32,32);
+const TLEFT = new Tile(false,96,32);
+const TRIGHT = new Tile(false,128,32);
+const XWALL = new Tile(false,0,32);
+const HDOOR = new Tile(true,96,64);
+const VDOOR = new Tile(true,64,64);
+
+Game.map.rows=13;
+Game.map.columns=15;
+Game.map.tiles=[TLCORNER,HWALL,HWALL,HWALL,HWALL,HWALL,HWALL,TDOWN,HWALL,HWALL,HWALL,HWALL,HWALL,HWALL,TRCORNER,
+          VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL,
+          VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL,
+          VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL,
+          VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL,
+          VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, TLCORNER, TUP, TRCORNER, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL,
+          TRIGHT, HDOOR, HWALL, HWALL, HWALL, HWALL, TLEFT, WATER, TRIGHT, HWALL, HWALL, HWALL, HWALL, HDOOR, TLEFT,
+          VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, BLCORNER, HDOOR, BRCORNER, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL,
+          VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL,
+          VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL,
+          VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL,
+          VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL,
+          BLCORNER, HWALL, HWALL, HWALL, HWALL, HWALL, HWALL, HWALL, HWALL, HWALL, HWALL, HWALL ,HWALL ,HWALL, BRCORNER];
+
+function endTurn()
+{
+    console.log(Game.player.position);
+}
+
