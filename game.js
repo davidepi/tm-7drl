@@ -14,6 +14,12 @@ const TRIGHT = new Tile(false,128,32);
 const XWALL = new Tile(false,0,32);
 const HDOOR = new Tile(true,96,64);
 const VDOOR = new Tile(true,64,64);
+const STAIRS = new Item(0,128,nextLevel);
+const FIRESHARD = new Item(0,160,increaseFire);
+const ICESHARD = new Item(32,160,increaseIce);
+const THUNDERSHARD = new Item(64,160,increaseThunder);
+
+
 /*
 Game.map.rows=13;
 Game.map.columns=15;
@@ -36,14 +42,17 @@ render();
 
 function endTurn()
 {
-    console.log(Game.player.position);
     document.getElementById("turn").innerHTML = ++Game.turn;
+    document.getElementById("hp").innerHTML = Game.player.curhp+"/"+Game.player.maxhp;
+    document.getElementById("fr").innerHTML = Game.player.fp+"%";
+    document.getElementById("ic").innerHTML = Game.player.ip+"%";
+    document.getElementById("th").innerHTML = Game.player.tp+"%";
 }
 
 function generateMap(magnitude)
 {
     Game.kstatus = Status.WAIT;
-    if(!magnitude) //first function
+    if(!magnitude) //first level
     {
         Game.map.rows = Math.random(10,20);
         Game.map.columns = Math.random(10,20);
@@ -64,12 +73,95 @@ function generateMap(magnitude)
         Game.map.tiles[(Game.map.rows-1)*(Game.map.columns)+Game.map.columns-1] = BRCORNER;
 
         //player position
-        Game.player.position.y = Game.map.rows-2;
         Game.player.position.x = Math.random(1,Game.map.columns-2);
+        Game.player.position.y = Game.map.rows-2;
+
+        //stairs
+        var x,y;
+        do
+        {
+            x = Math.random(1,Game.map.columns-2);
+            y = Math.random(1,Game.map.rows-2);
+        }
+        while(x!=Game.player.position.x && x!=Game.player.position.y && Game.objects[y*Game.map.columns+x]!=undefined)
+        Game.objects[y*Game.map.columns+x] = STAIRS;
+        do
+        {
+            x = Math.random(1,Game.map.columns-2);
+            y = Math.random(1,Game.map.rows-2);
+        }
+        while(x!=Game.player.position.x && x!=Game.player.position.y && Game.objects[y*Game.map.columns+x]!=undefined)
+        var a = Math.random(0,2);
+        switch(a)
+        {
+            case 0: Game.objects[y*Game.map.columns+x] = FIRESHARD;break;
+            case 1: Game.objects[y*Game.map.columns+x] = ICESHARD;break;
+            case 2: Game.objects[y*Game.map.columns+x] = THUNDERSHARD;break;
+        }
+
+        
     }
+    Game.kstatus = Status.MAP;
 }
 
-function introHall()
+function nextLevel()
+{
+    console.log("next level");
+}
+
+function increaseFire()
+{
+    Game.player.maxhp = Game.player.maxhp-Math.round(Game.player.maxhp/10);
+    if(Game.player.curhp > Game.player.maxhp)
+        Game.player.curhp = Game.player.maxhp;
+    if(Game.player.fp == 0 && Game.player.ip == 0 && Game.player.tp == 0)
+        Game.player.fp = 30;
+    else
+    {
+        Game.player.ip -= 2;
+        Game.player.tp -=2;
+        Game.player.gp +=5;
+    }
+    //TODO:
+    //add leveling of magic
+    
+    //remove from map
+    Game.objects[Game.player.position.y*Game.map.columns+Game.player.position.x] = undefined;
+}
+
+function increaseIce()
 {
 
+     Game.player.maxhp = Game.player.maxhp-Math.round(Game.player.maxhp/10);
+    if(Game.player.curhp > Game.player.maxhp)
+        Game.player.curhp = Game.player.maxhp;
+    if(Game.player.fp == 0 && Game.player.ip == 0 && Game.player.tp == 0)
+        Game.player.ip = 30;
+    else
+    {
+        Game.player.fp -= 2;
+        Game.player.tp -=2;
+        Game.player.ip +=5;
+    }
+    //TODO:
+    //add leveling of magic
+
+    Game.objects[Game.player.position.y*Game.map.columns+Game.player.position.x] = undefined;
+}
+
+function increaseThunder()
+{
+     Game.player.maxhp = Game.player.maxhp-Math.round(Game.player.maxhp/10);
+    if(Game.player.curhp > Game.player.maxhp)
+        Game.player.curhp = Game.player.maxhp;
+    if(Game.player.fp == 0 && Game.player.ip == 0 && Game.player.tp == 0)
+        Game.player.tp = 30;
+    else
+    {
+        Game.player.fp -= 2;
+        Game.player.ip -=2;
+        Game.player.tp +=5;
+    }
+
+    Game.objects[Game.player.position.y*Game.map.columns+Game.player.position.x] = undefined;
 }

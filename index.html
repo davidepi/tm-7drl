@@ -11,13 +11,15 @@
     <body onkeydown="keybind(event)">
         <div id="content">
             <div id="main-content">
-                <h1 class="menu">Title</h1>
+                <h1 class="menu">Tower of Magi - Hall</h1>
                 <div class="middle">
                     <canvas id="cvs" width="800" height="600"></canvas><div class="right-bar menu">
                         <div id="info">
-                            <div>HP: <span>100/100</span></div>
+                            <div>HP: <span id="hp">100/100</span></div>
                             <div>Turn: <span id="turn">0</span></div>
-                        }
+                            <div>Fire: <span id="fr">0%</span></div>
+                            <div>Ice: <span id="ic">0%</span></div>
+                            <div>Thunder: <span id="th">0%</span></div>
                         </div>
                         <div id="console">
                             <div>
@@ -29,7 +31,7 @@
                         </div>
                     </div>
                     <div>
-                        <div class="bottom-bar menu"><div class="row1"><div id="f1">r1</div><div id="g1">r2</div><div id="t1">r3</div></div><div class="row2"><div id="f2">r4</div><div id="g2">r5</div><div id="t2">r6</div></div><div class="row3"><div id="f3">r7</div><div id="g3">r8</div><div id="t3">r9</div></div></div>
+                        <div class="bottom-bar menu"><div class="row1"><div id="f1"></div><div id="g1"></div><div id="t1"></div></div><div class="row2"><div id="f2"></div><div id="g2"></div><div id="t2"></div></div><div class="row3"><div id="f3"></div><div id="g3"></div><div id="t3"></div></div></div>
                 </div>
     <script src='engine.js'></script>
     <script src='game.js'></script>

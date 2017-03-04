@@ -2,13 +2,14 @@ var Status = Object.freeze({MAP:0,MENU:1,SKILLMENU:2,WAIT:3});
 var Game =
 {
     kstatus:Status.MAP,
-    player:new Actor(7,9,100,new Tile(false,0,0)),
+    player:new Actor(7,9,100,new Tile(false,0,0),0,0,0),
     npcs:[],
     tilesize:32,
     size:{width:800,height:600,offsetx:undefined,offsety:undefined},
     spritesheet:new Image(),
     map:{tiles:[],hidden:[],rows:0,columns:0},
     overlay:[],
+    objects:[],
     turn:0,
 }
 Game.spritesheet.src = "spritesheet.png";
@@ -37,12 +38,22 @@ function Tile(accessible,startx,starty)
     this.y = starty;
 }
 
-function Actor(posx,posy,maxhp,sprite)
+function Item(startx,starty,action)
+{
+    this.x = startx;
+    this.y = starty;
+    this.trigger = action;
+}
+
+function Actor(posx,posy,maxhp,sprite,fire,ice,thunder)
 {
     this.position = {x:posx, y:posy};
     this.curhp = maxhp;
     this.maxhp = maxhp;
     this.model = sprite;
+    this.fp=fire;
+    this.ip=ice;
+    this.tp=thunder;
 }
 
 function init()
@@ -95,7 +106,12 @@ function render()
             if(Game.map.hidden[my*Game.map.columns+mx]==1) //undiscovered area
                 ctx.fillRect(mx*Game.tilesize+startx,my*Game.tilesize+starty,Game.tilesize,Game.tilesize);
             else
+            {
                 ctx.drawImage(Game.spritesheet,currentTile.x,currentTile.y,Game.tilesize,Game.tilesize,mx*Game.tilesize+startx,my*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                var obj = Game.objects[my*Game.map.columns+mx];
+                if(obj != undefined)
+                    ctx.drawImage(Game.spritesheet,obj.x,obj.y,Game.tilesize,Game.tilesize,mx*Game.tilesize+startx,my*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+            }
         }
 
     //drawplayer
@@ -103,15 +119,6 @@ function render()
     //draw NPCs
     for(var i=0;i<Game.npcs.length;i++)
         ctx.drawImage(Game.spritesheet,Game.npcs[i].model.x,Game.npcs[i].model.y,Game.tilesize,Game.tilesize,Game.npcs[i].position.x*Game.tilesize+startx,Game.npcs[i].position.y*Game.tilesize+starty,Game.tilesize,Game.tilesize);
-
-
-    //draw center line DELETE ME TODO 
-            ctx.moveTo(400,0);
-            ctx.lineTo(400,600);
-            ctx.moveTo(0,300);
-            ctx.lineTo(800,300);
-        ctx.strokeStyle="red";
-    ctx.stroke();
 }
 
 function keybind(evt)
@@ -223,6 +230,9 @@ function keybind(evt)
 
     if(trigger_turn)
     {
+        var current_cell_object = Game.objects[Game.player.position.y*Game.map.columns+Game.player.position.x];
+        if(current_cell_object != undefined)
+            current_cell_object.trigger();
         endTurn();
         render();
     }
