@@ -7,8 +7,9 @@ var Game =
     tilesize:32,
     size:{width:800,height:600,offsetx:undefined,offsety:undefined},
     spritesheet:new Image(),
-    map:{tiles:[],rows:0,columns:0},
+    map:{tiles:[],hidden:[],rows:0,columns:0},
     overlay:[],
+    turn:0,
 }
 Game.spritesheet.src = "spritesheet.png";
 Game.size.offsetx = Math.floor(Game.size.width/Game.tilesize/2);
@@ -17,6 +18,17 @@ Game.size.offsety = Math.floor(Game.size.height/Game.tilesize/2);
 var ctx = document.getElementById("cvs").getContext("2d");
 window.focus();
 window.onload = render;
+
+Math.seed = function(newseed)
+{
+    Math.seed = newseed;
+};
+
+Math.random = function(min,max)
+{
+    Math.seed=((7907*Math.seed)+7901)%(2147483647);
+    return Math.seed%(max-min+1)+min;
+}
 
 function Tile(accessible,startx,starty)
 {
@@ -40,9 +52,9 @@ function init()
 
 function render()
 {
-    ctx.rect(0,0,Game.size.width,Game.size.height);
     ctx.fillStyle="#222";
-    ctx.fill();
+    ctx.fillRect(0,0,Game.size.width,Game.size.height);
+    ctx.fillStyle="#000";
 
     var initx = 0; //iterator for the columns
     var inity = 0; //iterator for the rows
@@ -80,7 +92,10 @@ function render()
         for(var mx=initx;mx<Game.map.columns;mx++)
         {
             currentTile=Game.map.tiles[my*Game.map.columns+mx];
-            ctx.drawImage(Game.spritesheet,currentTile.x,currentTile.y,Game.tilesize,Game.tilesize,mx*Game.tilesize+startx,my*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+            if(Game.map.hidden[my*Game.map.columns+mx]==1) //undiscovered area
+                ctx.fillRect(mx*Game.tilesize+startx,my*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+            else
+                ctx.drawImage(Game.spritesheet,currentTile.x,currentTile.y,Game.tilesize,Game.tilesize,mx*Game.tilesize+startx,my*Game.tilesize+starty,Game.tilesize,Game.tilesize);
         }
 
     //drawplayer
