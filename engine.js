@@ -2,7 +2,7 @@ var Status = Object.freeze({MAP:0,MENU:1,SKILLMENU:2,WAIT:3});
 var Game =
 {
     kstatus:Status.MAP,
-    player:new Actor(7,9,100,new Tile(false,0,0),0,0,0),
+    player:new Actor(7,9,110,new Tile(false,0,0),0,0,0),
     npcs:[],
     tilesize:32,
     size:{width:800,height:600,offsetx:undefined,offsety:undefined},
@@ -11,6 +11,8 @@ var Game =
     overlay:[],
     objects:[],
     turn:0,
+    level:0,
+    enemies_left:1,
 }
 Game.spritesheet.src = "spritesheet.png";
 Game.size.offsetx = Math.floor(Game.size.width/Game.tilesize/2);
@@ -23,12 +25,17 @@ window.onload = render;
 Math.seed = function(newseed)
 {
     Math.seed = newseed;
-};
+}
 
 Math.random = function(min,max)
 {
     Math.seed=((7907*Math.seed)+7901)%(2147483647);
     return Math.seed%(max-min+1)+min;
+}
+
+console.log = function(string)
+{
+    document.getElementById("console").innerHTML += "<div>"+string+"</div>";
 }
 
 function Tile(accessible,startx,starty)
@@ -98,9 +105,10 @@ function render()
         inity = tmp;
         starty = -(inity*Game.tilesize) //since I start drawing with an offset in the map, here I correct that offset
     }
-    var currentTile;
-    for(var my=inity;my<Game.map.rows;my++)
-        for(var mx=initx;mx<Game.map.columns;mx++)
+    var currentTile, endy = Math.min(Game.map.rows,Game.size.height/32+inity), endx = Math.min(Game.map.columns,Game.size.width/32+initx);
+    console.log(mx+" "+endx);
+    for(var my=inity;my<endy;my++)
+        for(var mx=initx;mx<endx;mx++)
         {
             currentTile=Game.map.tiles[my*Game.map.columns+mx];
             if(Game.map.hidden[my*Game.map.columns+mx]==1) //undiscovered area

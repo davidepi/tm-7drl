@@ -19,29 +19,12 @@ const FIRESHARD = new Item(0,160,increaseFire);
 const ICESHARD = new Item(32,160,increaseIce);
 const THUNDERSHARD = new Item(64,160,increaseThunder);
 
-
-/*
-Game.map.rows=13;
-Game.map.columns=15;
-Game.map.tiles=[TLCORNER,HWALL,HWALL,HWALL,HWALL,HWALL,HWALL,TDOWN,HWALL,HWALL,HWALL,HWALL,HWALL,HWALL,TRCORNER,
-          VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL,
-          VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL,
-          VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL,
-          VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL,
-          VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, TLCORNER, TUP, TRCORNER, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL,
-          TRIGHT, HDOOR, HWALL, HWALL, HWALL, HWALL, TLEFT, WATER, TRIGHT, HWALL, HWALL, HWALL, HWALL, HDOOR, TLEFT,
-          VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, BLCORNER, HDOOR, BRCORNER, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL,
-          VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL,
-          VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL,
-          VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL,
-          VWALL, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, WOOD, VWALL,
-          BLCORNER, HWALL, HWALL, HWALL, HWALL, HWALL, HWALL, HWALL, HWALL, HWALL, HWALL, HWALL ,HWALL ,HWALL, BRCORNER];
-*/
 generateMap(0);
 render();
 
 function endTurn()
 {
+    document.getElementById("console").innerHTML = '';
     document.getElementById("turn").innerHTML = ++Game.turn;
     document.getElementById("hp").innerHTML = Game.player.curhp+"/"+Game.player.maxhp;
     document.getElementById("fr").innerHTML = Game.player.fp+"%";
