@@ -152,7 +152,7 @@ function increaseFire()
     //thought I don't want them
 
     //remove from map
-    //Game.objects[Game.player.position.y*Game.map.columns+Game.player.position.x] = undefined;
+    Game.objects[Game.player.position.y*Game.map.columns+Game.player.position.x] = undefined;
 }
 
 function increaseIce()
@@ -196,7 +196,7 @@ function increaseIce()
   //thought I don't want them
 
   //remove from map
-  //Game.objects[Game.player.position.y*Game.map.columns+Game.player.position.x] = undefined;
+  Game.objects[Game.player.position.y*Game.map.columns+Game.player.position.x] = undefined;
 }
 
 function increaseThunder()
@@ -240,5 +240,5 @@ function increaseThunder()
   //thought I don't want them
 
   //remove from map
-  //Game.objects[Game.player.position.y*Game.map.columns+Game.player.position.x] = undefined;
+  Game.objects[Game.player.position.y*Game.map.columns+Game.player.position.x] = undefined;
 }
