@@ -25,7 +25,7 @@ body
     box-sizing:border-box;
     border:3px solid white;
     border-radius: 8px;
-    color:white; 
+    color:white;
     background-color:black;
 }
 
@@ -85,4 +85,8 @@ h1
 #console > div
 {
     margin:10px 5px;
+}
+.selected
+{
+  color: yellow;
 }

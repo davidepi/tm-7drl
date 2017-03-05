@@ -24,7 +24,6 @@ render();
 
 function endTurn()
 {
-    document.getElementById("console").innerHTML = '';
     document.getElementById("turn").innerHTML = ++Game.turn;
     document.getElementById("hp").innerHTML = Game.player.curhp+"/"+Game.player.maxhp;
     document.getElementById("fr").innerHTML = Game.player.fp+"%";
@@ -82,69 +81,164 @@ function generateMap(magnitude)
             case 2: Game.objects[y*Game.map.columns+x] = THUNDERSHARD;break;
         }
 
-        
+
     }
     Game.kstatus = Status.MAP;
 }
 
 function nextLevel()
 {
-    console.log("next level");
+    if(Game.enemies_left == 0)
+    {
+      console.log("next level!");
+    }
+    else
+      switch(Game.level)
+      {
+        case 0:console.log("Please, collect the shard first :)");break;
+        case 1:console.log("You should defeat all your opponents to proceed!");break;
+        case 2:
+        case 3:
+        case 4:console.log("You have to kill every enemy mage before continuing");break;
+        case 5:
+        case 6:
+        case 7:console.log("You must slaughter every organic creature on sight before searching for others");break;
+        case 8:
+        case 9:
+      }
 }
 
 function increaseFire()
 {
+  //I could have written a better flow for this function to avoid checking the
+  //first level condition every time but who cares, this function does not
+  //contain any loop
+    var oldvalue = Game.player.fp;
+    var newvalue = undefined;
     Game.player.maxhp = Game.player.maxhp-Math.round(Game.player.maxhp/10);
     if(Game.player.curhp > Game.player.maxhp)
         Game.player.curhp = Game.player.maxhp;
-    if(Game.player.fp == 0 && Game.player.ip == 0 && Game.player.tp == 0)
-        Game.player.fp = 30;
+    if(oldvalue == 0 && Game.player.ip == 0 && Game.player.tp == 0)
+        {
+          Game.player.fp = 30;
+          Game.abilities[0] = 1;
+          document.getElementById("f1").innerHTML = "Fire";
+        }
     else
     {
-        Game.player.ip -= 2;
-        Game.player.tp -=2;
-        Game.player.gp +=5;
+        Game.player.ip = Game.player.ip>2?Game.player.ip-2:0;
+        Game.player.tp = Game.player.tp>2?Game.player.tp-2:0;
+        Game.player.fp +=5;
+        newvalue = Game.player.fp;
     }
-    //TODO:
-    //add leveling of magic
-    
+
+    //if first level newvalue is undefined so it will fail every evaluation
+    if(oldvalue == 0 && newvalue > 0) //add first tier
+    {
+        Game.abilities[0] = 1;
+        document.getElementById("f1").innerHTML = "Fire";
+    }
+    else if (oldvalue <100 && newvalue >= 100) //add second tier
+    {
+      Game.abilities[3] = 1;
+      document.getElementById("f2").innerHTML = "Blaze";
+    }
+    else if (oldvalue <200 && newvalue >= 200) //add third tier
+    {
+      Game.abilities[6] = 1;
+      document.getElementById("f3").innerHTML = "Inferno";
+    }
+    //Initially I put also some switch to remove the tiers, but on a second
+    //thought I don't want them
+
     //remove from map
-    Game.objects[Game.player.position.y*Game.map.columns+Game.player.position.x] = undefined;
+    //Game.objects[Game.player.position.y*Game.map.columns+Game.player.position.x] = undefined;
 }
 
 function increaseIce()
 {
-
-     Game.player.maxhp = Game.player.maxhp-Math.round(Game.player.maxhp/10);
-    if(Game.player.curhp > Game.player.maxhp)
-        Game.player.curhp = Game.player.maxhp;
-    if(Game.player.fp == 0 && Game.player.ip == 0 && Game.player.tp == 0)
+  var oldvalue = Game.player.ip;
+  var newvalue = undefined;
+  Game.player.maxhp = Game.player.maxhp-Math.round(Game.player.maxhp/10);
+  if(Game.player.curhp > Game.player.maxhp)
+      Game.player.curhp = Game.player.maxhp;
+  if(oldvalue == 0 && Game.player.fp == 0 && Game.player.tp == 0)
+      {
         Game.player.ip = 30;
-    else
-    {
-        Game.player.fp -= 2;
-        Game.player.tp -=2;
-        Game.player.ip +=5;
-    }
-    //TODO:
-    //add leveling of magic
+        Game.abilities[1] = 1;
+        document.getElementById("g1").innerHTML = "Frost";
+      }
+  else
+  {
+      Game.player.fp = Game.player.fp>2?Game.player.fp-2:0;
+      Game.player.tp = Game.player.tp>2?Game.player.tp-2:0;
+      Game.player.ip +=5;
+      newvalue = Game.player.ip;
+  }
 
-    Game.objects[Game.player.position.y*Game.map.columns+Game.player.position.x] = undefined;
+  //if first level newvalue is undefined so it will fail every evaluation
+  if(oldvalue == 0 && newvalue > 0) //add first tier
+  {
+      Game.abilities[1] = 1;
+      document.getElementById("g1").innerHTML = "Frost";
+  }
+  else if (oldvalue <100 && newvalue >= 100) //add second tier
+  {
+    Game.abilities[4] = 1;
+    document.getElementById("g2").innerHTML = "Ice";
+  }
+  else if (oldvalue <200 && newvalue >= 200) //add third tier
+  {
+    Game.abilities[7] = 1;
+    document.getElementById("g3").innerHTML = "Avalanche";
+  }
+  //Initially I put also some switch to remove the tiers, but on a second
+  //thought I don't want them
+
+  //remove from map
+  //Game.objects[Game.player.position.y*Game.map.columns+Game.player.position.x] = undefined;
 }
 
 function increaseThunder()
 {
-     Game.player.maxhp = Game.player.maxhp-Math.round(Game.player.maxhp/10);
-    if(Game.player.curhp > Game.player.maxhp)
-        Game.player.curhp = Game.player.maxhp;
-    if(Game.player.fp == 0 && Game.player.ip == 0 && Game.player.tp == 0)
+  var oldvalue = Game.player.tp;
+  var newvalue = undefined;
+  Game.player.maxhp = Game.player.maxhp-Math.round(Game.player.maxhp/10);
+  if(Game.player.curhp > Game.player.maxhp)
+      Game.player.curhp = Game.player.maxhp;
+  if(oldvalue == 0 && Game.player.ip == 0 && Game.player.fp == 0)
+      {
         Game.player.tp = 30;
-    else
-    {
-        Game.player.fp -= 2;
-        Game.player.ip -=2;
-        Game.player.tp +=5;
-    }
+        Game.abilities[2] = 1;
+        document.getElementById("t1").innerHTML = "Spark";
+      }
+  else
+  {
+      Game.player.ip = Game.player.ip>2?Game.player.ip-2:0;
+      Game.player.fp = Game.player.fp>2?Game.player.fp-2:0;
+      Game.player.tp +=5;
+      newvalue = Game.player.tp;
+  }
 
-    Game.objects[Game.player.position.y*Game.map.columns+Game.player.position.x] = undefined;
+  //if first level newvalue is undefined so it will fail every evaluation
+  if(oldvalue == 0 && newvalue > 0) //add first tier
+  {
+      Game.abilities[2] = 1;
+      document.getElementById("t1").innerHTML = "Spark";
+  }
+  else if (oldvalue <100 && newvalue >= 100) //add second tier
+  {
+    Game.abilities[5] = 1;
+    document.getElementById("t2").innerHTML = "Bolt";
+  }
+  else if (oldvalue <200 && newvalue >= 200) //add third tier
+  {
+    Game.abilities[8] = 1;
+    document.getElementById("t3").innerHTML = "Lightning";
+  }
+  //Initially I put also some switch to remove the tiers, but on a second
+  //thought I don't want them
+
+  //remove from map
+  //Game.objects[Game.player.position.y*Game.map.columns+Game.player.position.x] = undefined;
 }
