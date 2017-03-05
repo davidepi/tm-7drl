@@ -1,22 +1,22 @@
 var Status = Object.freeze({MAP:0,MENU:1,SKILLMENU:2,WAIT:3});
 var Game =
-{
-    kstatus:Status.MAP,
-    player:new Actor(7,9,110,new Tile(false,0,0),0,0,0),
-    npcs:[],
-    tilesize:32,
-    size:{width:800,height:600,offsetx:undefined,offsety:undefined},
-    spritesheet:new Image(),
-    map:{tiles:[],hidden:[],rows:0,columns:0},
-    overlay:[],
-    objects:[],
-    abilities:[0,0,0,0,0,0,0,0,0],
-    skills:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    turn:0,
-    level:0,
-    enemies_left:1,
-    selected:undefined,
-}
+    {
+        kstatus:Status.MAP,
+        player:new Actor(7,9,110,new Tile(false,0,0),0,0,0),
+        npcs:[],
+        tilesize:32,
+        size:{width:800,height:600,offsetx:undefined,offsety:undefined},
+        spritesheet:new Image(),
+        map:{tiles:[],hidden:[],rows:0,columns:0},
+        overlay:[],
+        objects:[],
+        abilities:[0,0,0,0,0,0,0,0,0],
+        skills:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        turn:0,
+        level:0,
+        enemies_left:1,
+        selected:undefined,
+    }
 Game.spritesheet.src = "spritesheet.png";
 Game.size.offsetx = Math.floor(Game.size.width/Game.tilesize/2);
 Game.size.offsety = Math.floor(Game.size.height/Game.tilesize/2);
@@ -150,35 +150,35 @@ function keybind(evt)
                 {
                     if(Game.player.position.x > 0 &&
                         Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x-1].accessible == true)
-                      {
+                    {
                         Game.player.position.x--;
                         trigger_turn = true;
-                      }
+                    }
                     next_status = Status.MAP;
                 }
                 else if(current_status == Status.MENU)
                 {
-                  //this is horseshit, but It's 3AM and I don't want to think
-                  //abount something better
-                  var next,unlocked;
+                    //this is horseshit, but It's 3AM and I don't want to think
+                    //abount something better
+                    var next,unlocked;
                     switch(Game.selected)
                     {
-                      case "f1":
-                      case "f2":
-                      case "f3":next = Game.selected;break;
-                      case "g1":next = "f1";unlocked = Game.abilities[0];break;
-                      case "g2":next = "f2";unlocked = Game.abilities[3];break;
-                      case "g3":next = "f3";unlocked = Game.abilities[6];break;
-                      case "t1":next = "g1";unlocked = Game.abilities[1];break;
-                      case "t2":next = "g2";unlocked = Game.abilities[4];break;
-                      case "t3":next = "g3";unlocked = Game.abilities[7];break;
+                        case "f1":
+                        case "f2":
+                        case "f3":next = Game.selected;break;
+                        case "g1":next = "f1";unlocked = Game.abilities[0];break;
+                        case "g2":next = "f2";unlocked = Game.abilities[3];break;
+                        case "g3":next = "f3";unlocked = Game.abilities[6];break;
+                        case "t1":next = "g1";unlocked = Game.abilities[1];break;
+                        case "t2":next = "g2";unlocked = Game.abilities[4];break;
+                        case "t3":next = "g3";unlocked = Game.abilities[7];break;
                     }
                     if(unlocked)
                     {
-                    document.getElementById(Game.selected).className = '';
-                    Game.selected = next;
-                    document.getElementById(Game.selected).className = 'selected';
-                  }
+                        document.getElementById(Game.selected).className = '';
+                        Game.selected = next;
+                        document.getElementById(Game.selected).className = 'selected';
+                    }
                     next_status = Status.MENU;
                 }
                 break;
@@ -190,35 +190,35 @@ function keybind(evt)
                 {
                     if(Game.player.position.y > 0 &&
                         Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x].accessible == true)
-                        {
+                    {
                         Game.player.position.y--;
                         trigger_turn = true;
-                      }
+                    }
                     next_status = Status.MAP;
                 }
                 else if (current_status == Status.MENU)
                 {
-                  //this is horseshit, but It's 3AM and I don't want to think
-                  //abount something better
-                  var next,unlocked;
+                    //this is horseshit, but It's 3AM and I don't want to think
+                    //abount something better
+                    var next,unlocked;
                     switch(Game.selected)
                     {
-                      case "f1":
-                      case "g1":
-                      case "t1":next = Game.selected;break;
-                      case "f2":next = "f1";unlocked = Game.abilities[0];break;
-                      case "g2":next = "g1";unlocked = Game.abilities[1];break;
-                      case "t2":next = "t1";unlocked = Game.abilities[2];break;
-                      case "f3":next = "f2";unlocked = Game.abilities[3];break;
-                      case "g3":next = "g2";unlocked = Game.abilities[4];break;
-                      case "t3":next = "t2";unlocked = Game.abilities[5];break;
+                        case "f1":
+                        case "g1":
+                        case "t1":next = Game.selected;break;
+                        case "f2":next = "f1";unlocked = Game.abilities[0];break;
+                        case "g2":next = "g1";unlocked = Game.abilities[1];break;
+                        case "t2":next = "t1";unlocked = Game.abilities[2];break;
+                        case "f3":next = "f2";unlocked = Game.abilities[3];break;
+                        case "g3":next = "g2";unlocked = Game.abilities[4];break;
+                        case "t3":next = "t2";unlocked = Game.abilities[5];break;
                     }
                     if(unlocked)
                     {
-                    document.getElementById(Game.selected).className = '';
-                    Game.selected = next;
-                    document.getElementById(Game.selected).className = 'selected';
-                  }
+                        document.getElementById(Game.selected).className = '';
+                        Game.selected = next;
+                        document.getElementById(Game.selected).className = 'selected';
+                    }
                     next_status = Status.MENU;
                 }
                 break;
@@ -231,35 +231,35 @@ function keybind(evt)
                 {
                     if(Game.player.position.x > 0 &&
                         Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x+1].accessible == true)
-                        {
+                    {
                         Game.player.position.x++;
                         trigger_turn = true;
-                      }
+                    }
                     next_status = Status.MAP;
                 }
                 else if (current_status == Status.MENU)
                 {
-                  //this is horseshit, but It's 3AM and I don't want to think
-                  //abount something better
-                  var next,unlocked;
+                    //this is horseshit, but It's 3AM and I don't want to think
+                    //abount something better
+                    var next,unlocked;
                     switch(Game.selected)
                     {
-                      case "f1":next = "g1";unlocked = Game.abilities[1];break;
-                      case "f2":next = "g2";unlocked = Game.abilities[4];break;
-                      case "f3":next = "g3";unlocked = Game.abilities[7];break;
-                      case "g1":next = "t1";unlocked = Game.abilities[2];break;
-                      case "g2":next = "t2";unlocked = Game.abilities[5];break;
-                      case "g3":next = "t3";unlocked = Game.abilities[8];break;
-                      case "t1":
-                      case "t2":
-                      case "t3":next = Game.selected;break;
+                        case "f1":next = "g1";unlocked = Game.abilities[1];break;
+                        case "f2":next = "g2";unlocked = Game.abilities[4];break;
+                        case "f3":next = "g3";unlocked = Game.abilities[7];break;
+                        case "g1":next = "t1";unlocked = Game.abilities[2];break;
+                        case "g2":next = "t2";unlocked = Game.abilities[5];break;
+                        case "g3":next = "t3";unlocked = Game.abilities[8];break;
+                        case "t1":
+                        case "t2":
+                        case "t3":next = Game.selected;break;
                     }
                     if(unlocked)
                     {
-                    document.getElementById(Game.selected).className = '';
-                    Game.selected = next;
-                    document.getElementById(Game.selected).className = 'selected';
-                  }
+                        document.getElementById(Game.selected).className = '';
+                        Game.selected = next;
+                        document.getElementById(Game.selected).className = 'selected';
+                    }
                     next_status = Status.MENU;
                 }
                 break;
@@ -272,35 +272,35 @@ function keybind(evt)
                 {
                     if(Game.player.position.y > 0 &&
                         Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x].accessible == true)
-                        {
+                    {
                         Game.player.position.y++;
                         trigger_turn = true;
-                      }
+                    }
                     next_status = Status.MAP;
                 }
                 else if (current_status == Status.MENU)
                 {
-                  //this is horseshit, but It's 3AM and I don't want to think
-                  //abount something better
-                  var next,unlocked = undefined;
+                    //this is horseshit, but It's 3AM and I don't want to think
+                    //abount something better
+                    var next,unlocked = undefined;
                     switch(Game.selected)
                     {
-                      case "f1":next = "f2";unlocked = Game.abilities[3];break;
-                      case "g1":next = "g2";unlocked = Game.abilities[4];break;
-                      case "t1":next = "t2";unlocked = Game.abilities[5];break;
-                      case "f2":next = "f3";unlocked = Game.abilities[6];break;
-                      case "g2":next = "g3";unlocked = Game.abilities[7];break;
-                      case "t2":next = "t3";unlocked = Game.abilities[8];break;
-                      case "f3":
-                      case "g3":
-                      case "t3":next = Game.selected;break;
+                        case "f1":next = "f2";unlocked = Game.abilities[3];break;
+                        case "g1":next = "g2";unlocked = Game.abilities[4];break;
+                        case "t1":next = "t2";unlocked = Game.abilities[5];break;
+                        case "f2":next = "f3";unlocked = Game.abilities[6];break;
+                        case "g2":next = "g3";unlocked = Game.abilities[7];break;
+                        case "t2":next = "t3";unlocked = Game.abilities[8];break;
+                        case "f3":
+                        case "g3":
+                        case "t3":next = Game.selected;break;
                     }
                     if(unlocked)
                     {
-                    document.getElementById(Game.selected).className = '';
-                    Game.selected = next;
-                    document.getElementById(Game.selected).className = 'selected';
-                  }
+                        document.getElementById(Game.selected).className = '';
+                        Game.selected = next;
+                        document.getElementById(Game.selected).className = 'selected';
+                    }
                     next_status = Status.MENU;
                 }
                 break;
@@ -308,59 +308,59 @@ function keybind(evt)
             }
         case 122://this way it can work even with caps lock enabled //z,Z
         case 90:
-        {
-          if(current_status == Status.MAP)
-          {
-            trigger_turn = false;
-            next_status = Status.MENU;
-            if(Game.abilities[0])
             {
-              document.getElementById("f1").className = "selected";
-              Game.selected = "f1";
-              break;
+                if(current_status == Status.MAP)
+                {
+                    trigger_turn = false;
+                    next_status = Status.MENU;
+                    if(Game.abilities[0])
+                    {
+                        document.getElementById("f1").className = "selected";
+                        Game.selected = "f1";
+                        break;
+                    }
+                    else if(Game.abilities[1])
+                    {
+                        document.getElementById("g1").className = "selected";
+                        Game.selected = "g1";
+                        break;
+                    }
+                    else if(Game.abilities[2])
+                    {
+                        document.getElementById("t1").className = "selected";
+                        Game.selected = "t1";
+                        break;
+                    }
+                    else
+                    {
+                        next_status = Status.MAP;
+                        break;
+                    }
+                }
+                else
+                {
+                    trigger_turn = false;
+                    break;
+                }
             }
-            else if(Game.abilities[1])
-            {
-              document.getElementById("g1").className = "selected";
-              Game.selected = "g1";
-              break;
-            }
-            else if(Game.abilities[2])
-            {
-                document.getElementById("t1").className = "selected";
-                Game.selected = "t1";
-                break;
-            }
-            else
-            {
-              next_status = Status.MAP;
-              break;
-            }
-          }
-          else
-          {
-            trigger_turn = false;
-            break;
-          }
-        }
         case 120: //x,X
         case 88:
-        {
-          if(current_status == Status.MENU)
-          {
-            next_status = Status.MAP;
-            trigger_turn = false;
-            document.getElementById(Game.selected).className = '';
-            Game.selected = undefined;
-            break;
-          }
-          else
-          {
-            trigger_turn = false;
-            next_status = Status.MAP
-            break;
-          }
-        }
+            {
+                if(current_status == Status.MENU)
+                {
+                    next_status = Status.MAP;
+                    trigger_turn = false;
+                    document.getElementById(Game.selected).className = '';
+                    Game.selected = undefined;
+                    break;
+                }
+                else
+                {
+                    trigger_turn = false;
+                    next_status = Status.MAP
+                    break;
+                }
+            }
         case 107: //k,K
         case 75: console.log("key k");break;
         case 108: //l,L
