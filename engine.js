@@ -1,4 +1,4 @@
-var Status = Object.freeze({MAP:0,MENU:1,SKILLMENU:2,WAIT:3});
+var Status = Object.freeze({MAP:0,MENU:1,AIM:2,SKILLMENU:3,WAIT:4});
 var Game =
     {
         kstatus:Status.MAP,
@@ -16,6 +16,7 @@ var Game =
         level:0,
         enemies_left:1,
         selected:undefined,
+        target:1, //0 - left, 1 - up, 2 - right, 3 - down
     }
 Game.spritesheet.src = "spritesheet.png";
 Game.size.offsetx = Math.floor(Game.size.width/Game.tilesize/2);
@@ -126,6 +127,10 @@ function render()
 
     //drawplayer
     ctx.drawImage(Game.spritesheet,Game.player.model.x,Game.player.model.y,Game.tilesize,Game.tilesize,Game.player.position.x*Game.tilesize+startx,Game.player.position.y*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+
+    if(Game.kstatus==Status.AIM) //draw aim
+      aim(Game.selected,startx,starty);
+
     //draw NPCs
     for(var i=0;i<Game.npcs.length;i++)
         ctx.drawImage(Game.spritesheet,Game.npcs[i].model.x,Game.npcs[i].model.y,Game.tilesize,Game.tilesize,Game.npcs[i].position.x*Game.tilesize+startx,Game.npcs[i].position.y*Game.tilesize+starty,Game.tilesize,Game.tilesize);
@@ -138,6 +143,7 @@ function keybind(evt)
     var current_status = Game.kstatus;
     var next_status;
     var trigger_turn = false;
+    var force_redraw = false;
     Game.kstatus = Status.WAIT;
     //TODO: what if charCode and keyCode share ambiguous values?
     var e=evt.keyCode!=0?evt.keyCode:evt.charCode;
@@ -181,6 +187,12 @@ function keybind(evt)
                     }
                     next_status = Status.MENU;
                 }
+                else if(current_status == Status.AIM)
+                {
+                  next_status = Status.AIM;
+                  force_redraw = true;
+                  Game.target = 0;
+                }
                 break;
             }
         case 38: //Key up
@@ -220,6 +232,12 @@ function keybind(evt)
                         document.getElementById(Game.selected).className = 'selected';
                     }
                     next_status = Status.MENU;
+                }
+                else if(current_status == Status.AIM)
+                {
+                  next_status = Status.AIM;
+                  force_redraw = true;
+                  Game.target = 1;
                 }
                 break;
 
@@ -262,6 +280,12 @@ function keybind(evt)
                     }
                     next_status = Status.MENU;
                 }
+                else if(current_status == Status.AIM)
+                {
+                  next_status = Status.AIM;
+                  force_redraw = true;
+                  Game.target = 2;
+                }
                 break;
 
             }
@@ -303,6 +327,12 @@ function keybind(evt)
                     }
                     next_status = Status.MENU;
                 }
+                else if(current_status == Status.AIM)
+                {
+                  next_status = Status.AIM;
+                  force_redraw = true;
+                  Game.target = 3;
+                }
                 break;
 
             }
@@ -311,55 +341,55 @@ function keybind(evt)
             {
                 if(current_status == Status.MAP)
                 {
-                    trigger_turn = false;
                     next_status = Status.MENU;
                     if(Game.abilities[0])
                     {
                         document.getElementById("f1").className = "selected";
                         Game.selected = "f1";
-                        break;
                     }
                     else if(Game.abilities[1])
                     {
                         document.getElementById("g1").className = "selected";
                         Game.selected = "g1";
-                        break;
                     }
                     else if(Game.abilities[2])
                     {
                         document.getElementById("t1").className = "selected";
                         Game.selected = "t1";
-                        break;
                     }
                     else
-                    {
                         next_status = Status.MAP;
-                        break;
-                    }
                 }
-                else
+                else if (current_status == Status.MENU)
                 {
-                    trigger_turn = false;
-                    break;
+                  force_redraw = true;
+                  next_status = Status.AIM;
                 }
+                else if (current_status == Status.AIM)
+                {
+                  //TODO: cast
+                  trigger_turn = true;
+                  document.getElementById(Game.selected).className = "";
+                  next_status = Status.MAP;
+                }
+                break;
             }
         case 120: //x,X
         case 88:
             {
-                if(current_status == Status.MENU)
+                if(current_status == Status.MENU || current_status == Status.AIM)
                 {
                     next_status = Status.MAP;
-                    trigger_turn = false;
+                    force_redraw = true;
                     document.getElementById(Game.selected).className = '';
                     Game.selected = undefined;
-                    break;
                 }
                 else
                 {
                     trigger_turn = false;
                     next_status = Status.MAP
-                    break;
                 }
+                break;
             }
         case 107: //k,K
         case 75: console.log("key k");break;
@@ -386,4 +416,6 @@ function keybind(evt)
         render();
     }
     Game.kstatus = next_status;
+    if(force_redraw)
+      render(); //force rerender of the tiles even if the turn didn't elapsed
 }
