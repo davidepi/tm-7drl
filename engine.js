@@ -369,7 +369,7 @@ function keybind(evt)
                 }
                 else if (current_status == Status.AIM)
                 {
-                  //TODO: cast
+                  cast(Game.selected);
                   trigger_turn = true;
                   document.getElementById(Game.selected).className = "";
                   next_status = Status.MAP;
@@ -410,7 +410,7 @@ function keybind(evt)
 
     if(trigger_turn)
     {
-        document.getElementById("console").innerHTML = '';
+        //document.getElementById("console").innerHTML = '';
         var current_cell_object = Game.objects[Game.player.position.y*Game.map.columns+Game.player.position.x];
         if(current_cell_object != undefined)
             current_cell_object.trigger();
