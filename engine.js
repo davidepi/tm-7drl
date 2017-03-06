@@ -9,6 +9,7 @@ var Game =
         spritesheet:new Image(),
         map:{tiles:[],hidden:[],rows:0,columns:0},
         overlay:[],
+        Xoverlay:[], //overlay next turn
         objects:[],
         abilities:[0,0,0,0,0,0,0,0,0],
         skills:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -17,6 +18,7 @@ var Game =
         enemies_left:1,
         selected:undefined,
         target:1, //0 - left, 1 - up, 2 - right, 3 - down
+        aimed:[], //the cells where the spell will be cast. When aiming this array is populated, to avoid reprocessing the obstables again when casting
     }
 Game.spritesheet.src = "spritesheet.png";
 Game.size.offsetx = Math.floor(Game.size.width/Game.tilesize/2);

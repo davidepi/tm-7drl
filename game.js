@@ -130,6 +130,8 @@ function increaseFire()
         Game.player.ip = Game.player.ip>2?Game.player.ip-2:0;
         Game.player.tp = Game.player.tp>2?Game.player.tp-2:0;
         Game.player.fp +=5;
+        if(Game.player.fp > 300)
+          Game.player.fp = 300;
         newvalue = Game.player.fp;
     }
 
@@ -175,6 +177,8 @@ function increaseIce()
         Game.player.fp = Game.player.fp>2?Game.player.fp-2:0;
         Game.player.tp = Game.player.tp>2?Game.player.tp-2:0;
         Game.player.ip +=5;
+        if(Game.player.ip > 300)
+          Game.player.ip = 300;
         newvalue = Game.player.ip;
     }
 
@@ -220,6 +224,8 @@ function increaseThunder()
         Game.player.ip = Game.player.ip>2?Game.player.ip-2:0;
         Game.player.fp = Game.player.fp>2?Game.player.fp-2:0;
         Game.player.tp +=5;
+        if(Game.player.tp>300)
+          Game.player.tp = 300;
         newvalue = Game.player.tp;
     }
 
@@ -251,11 +257,11 @@ function aim(spell,startx,starty)
   console.log("reaim");
   //these two values are used to translate the pattern below/left/right/above
   //the player
-  var xaim = Game.target==1||Game.target==3?0:Game.target==0?-1:1;
-  var yaim = Game.target==0||Game.target==2?0:Game.target==1?-1:1;
+
   var offsetx,offsety;
   if(Game.target==1||Game.target==3) //aiming top or bottom
   {
+    var yaim = Game.target==0||Game.target==2?0:Game.target==1?-1:1;
     switch(Game.selected)
     {
       case "f1":
@@ -635,13 +641,400 @@ function aim(spell,startx,starty)
       case "t2":
       case "t3":
       {
-        offsety = 4 * yaim;
-        offsetx = 4 * xaim;
-        if(Game.map.tiles[(Game.player.position.y+offsety)*Game.map.columns+(Game.player.position.x+offsetx)].accessible)
+        if(Game.map.tiles[(Game.player.position.y+yaim)*Game.map.columns+(Game.player.position.x)].accessible &&
+         Game.map.tiles[(Game.player.position.y+2*yaim)*Game.map.columns+(Game.player.position.x)].accessible &&
+         Game.map.tiles[(Game.player.position.y+3*yaim)*Game.map.columns+(Game.player.position.x)].accessible &&
+         Game.map.tiles[(Game.player.position.y+4*yaim)*Game.map.columns+(Game.player.position.x)].accessible)
           ctx.fillStyle = "rgba(0,150,0,0.5)";
           else
           ctx.fillStyle = "rgba(150,0,0,0.5)";
-          ctx.fillRect((Game.player.position.x+offsetx)*Game.tilesize+startx,(Game.player.position.y+offsety)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+          ctx.fillRect((Game.player.position.x)*Game.tilesize+startx,(Game.player.position.y+4*yaim)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+          break;
+        }
+    }
+  }
+  else
+  {
+    var yaim = Game.target==1||Game.target==3?0:Game.target==0?-1:1;
+    switch(Game.selected)
+    {
+      case "f1":
+      {
+        if(Game.map.tiles[(Game.player.position.y)*Game.map.columns+(Game.player.position.x+yaim)].accessible && //path in front of player
+           Game.map.tiles[(Game.player.position.y)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible &&
+           Game.map.tiles[(Game.player.position.y)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
+           {
+             ctx.fillStyle = "rgba(0,150,0,0.5)";
+             ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+           }
+           else
+           {
+              ctx.fillStyle = "rgba(150,0,0,0.5)"
+              ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+              break;
+           }
+          if(Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible && //left branch accessible
+             Game.map.tiles[(Game.player.position.y-2)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible &&
+             Game.map.tiles[(Game.player.position.y-3)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible &&
+             Game.map.tiles[(Game.player.position.y-4)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
+             {
+               ctx.fillStyle = "rgba(0,150,0,0.5)";
+               ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y-4)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+             }
+             else
+             {
+               ctx.fillStyle = "rgba(150,0,0,0.5)";
+               ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y-4)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+             }
+             if(Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible && //right branch accessible
+                Game.map.tiles[(Game.player.position.y+2)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible &&
+                Game.map.tiles[(Game.player.position.y+3)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible &&
+                Game.map.tiles[(Game.player.position.y+4)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
+                {
+                  ctx.fillStyle = "rgba(0,150,0,0.5)";
+                  ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y+4)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                }
+                else
+                {
+                  ctx.fillStyle = "rgba(150,0,0,0.5)";
+                  ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y+4)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                }
+            break;
+
+      }
+      case "f2":
+      {
+        if(Game.map.tiles[(Game.player.position.y)*Game.map.columns+(Game.player.position.x+yaim)].accessible && //path in front of player
+           Game.map.tiles[(Game.player.position.y)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible &&
+           Game.map.tiles[(Game.player.position.y)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
+           {
+             ctx.fillStyle = "rgba(0,150,0,0.5)";
+             ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+           }
+           else
+           {
+              ctx.fillStyle = "rgba(150,0,0,0.5)"
+              ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+              break;
+           }
+          if(Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible && //left branch accessible
+             Game.map.tiles[(Game.player.position.y-2)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
+             {
+               ctx.fillStyle = "rgba(0,150,0,0.5)";
+               ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y-2)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+               if(Game.map.tiles[(Game.player.position.y-3)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible && //left branch accessible
+                  Game.map.tiles[(Game.player.position.y-4)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
+                  {
+                    ctx.fillStyle = "rgba(0,150,0,0.5)";
+                    ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y-4)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                  }
+                  else
+                  {
+                    ctx.fillStyle = "rgba(150,0,0,0.5)"
+                    ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y-4)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                  }
+             }
+             else
+             {
+               ctx.fillStyle = "rgba(150,0,0,0.5)"
+               ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y-2)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+             }
+             if(Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible && //left branch accessible
+                Game.map.tiles[(Game.player.position.y+2)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
+                {
+                  ctx.fillStyle = "rgba(0,150,0,0.5)";
+                  ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y+2)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                  if(Game.map.tiles[(Game.player.position.y+3)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible && //left branch accessible
+                     Game.map.tiles[(Game.player.position.y+4)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
+                     {
+                       ctx.fillStyle = "rgba(0,150,0,0.5)";
+                       ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y+4)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                     }
+                     else
+                     {
+                       ctx.fillStyle = "rgba(150,0,0,0.5)"
+                       ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y+4)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                     }
+                }
+                else
+                {
+                  ctx.fillStyle = "rgba(150,0,0,0.5)"
+                  ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y+2)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                }
+
+          break;
+      }
+      case "f3":
+      {
+        if(Game.map.tiles[(Game.player.position.y)*Game.map.columns+(Game.player.position.x+yaim)].accessible && //path in front of player
+           Game.map.tiles[(Game.player.position.y)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible &&
+           Game.map.tiles[(Game.player.position.y)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
+           {
+             ctx.fillStyle = "rgba(0,150,0,0.5)";
+             ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+           }
+           else
+           {
+              ctx.fillStyle = "rgba(150,0,0,0.5)"
+              ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+              break;
+           }
+          if(Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible) //left branch accessible
+             {
+               ctx.fillStyle = "rgba(0,150,0,0.5)";
+               ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y-1)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+               if(Game.map.tiles[(Game.player.position.y-2)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
+               {
+                 ctx.fillStyle = "rgba(0,150,0,0.5)";
+                 ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y-2)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                 if(Game.map.tiles[(Game.player.position.y-3)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
+                 {
+                   ctx.fillStyle = "rgba(0,150,0,0.5)";
+                   ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y-3)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                   if(Game.map.tiles[(Game.player.position.y-4)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
+                   {
+                     ctx.fillStyle = "rgba(0,150,0,0.5)";
+                     ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y-4)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                   }
+                   else
+                   {
+                     ctx.fillStyle = "rgba(150,0,0,0.5)"
+                     ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y-4)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                   }
+                 }
+                 else
+                 {
+                   ctx.fillStyle = "rgba(150,0,0,0.5)"
+                   ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y-3)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                 }
+               }
+               else
+               {
+                 ctx.fillStyle = "rgba(150,0,0,0.5)"
+                 ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y-2)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+               }
+             }
+             else
+             {
+               ctx.fillStyle = "rgba(150,0,0,0.5)"
+               ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y-1)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+             }
+
+
+             if(Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible) //right branch accessible
+                {
+                  ctx.fillStyle = "rgba(0,150,0,0.5)";
+                  ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y+1)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                  if(Game.map.tiles[(Game.player.position.y+2)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
+                  {
+                    ctx.fillStyle = "rgba(0,150,0,0.5)";
+                    ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y+2)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                    if(Game.map.tiles[(Game.player.position.y+3)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
+                    {
+                      ctx.fillStyle = "rgba(0,150,0,0.5)";
+                      ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y+3)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                      if(Game.map.tiles[(Game.player.position.y+4)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
+                      {
+                        ctx.fillStyle = "rgba(0,150,0,0.5)";
+                        ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y+4)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                      }
+                      else
+                      {
+                        ctx.fillStyle = "rgba(150,0,0,0.5)"
+                        ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y+4)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                      }
+                    }
+                    else
+                    {
+                      ctx.fillStyle = "rgba(150,0,0,0.5)"
+                      ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y+3)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                    }
+                  }
+                  else
+                  {
+                    ctx.fillStyle = "rgba(150,0,0,0.5)"
+                    ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y+2)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                  }
+                }
+             else
+             {
+               ctx.fillStyle = "rgba(150,0,0,0.5)"
+               ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y+1)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+             }
+          break;
+      }
+      case "g1":
+      {
+        if(Game.map.tiles[(Game.player.position.y)*Game.map.columns+(Game.player.position.x+yaim)].accessible && //path in front of player
+           Game.map.tiles[(Game.player.position.y)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible)
+           {
+             ctx.fillStyle = "rgba(0,150,0,0.5)";
+             ctx.fillRect((Game.player.position.x+2*yaim)*Game.tilesize+startx,(Game.player.position.y)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+           }
+           else
+           {
+              ctx.fillStyle = "rgba(150,0,0,0.5)"
+              ctx.fillRect((Game.player.position.x+2*yaim)*Game.tilesize+startx,(Game.player.position.y)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+              break;
+           }
+        if(Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible)
+        {
+          ctx.fillStyle = "rgba(0,150,0,0.5)";
+          ctx.fillRect((Game.player.position.x+2*yaim)*Game.tilesize+startx,(Game.player.position.y-1)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+        }
+        else
+        {
+          ctx.fillStyle = "rgba(0,150,0,0.5)";
+          ctx.fillRect((Game.player.position.x+2*yaim)*Game.tilesize+startx,(Game.player.position.y-1)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+        }
+        if(Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible)
+        {
+          ctx.fillStyle = "rgba(0,150,0,0.5)";
+          ctx.fillRect((Game.player.position.x+2*yaim)*Game.tilesize+startx,(Game.player.position.y+1)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+        }
+        else
+        {
+          ctx.fillStyle = "rgba(0,150,0,0.5)";
+          ctx.fillRect((Game.player.position.x+2*yaim)*Game.tilesize+startx,(Game.player.position.y+1)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+        }
+        break;
+      }
+      case "g2":
+      {
+        if(Game.map.tiles[(Game.player.position.y)*Game.map.columns+(Game.player.position.x+yaim)].accessible && //path in front of player
+           Game.map.tiles[(Game.player.position.y)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible)
+           {
+             ctx.fillStyle = "rgba(0,150,0,0.5)";
+             ctx.fillRect((Game.player.position.x+2*yaim)*Game.tilesize+startx,(Game.player.position.y)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+           }
+           else
+           {
+              ctx.fillStyle = "rgba(150,0,0,0.5)"
+              ctx.fillRect((Game.player.position.x+2*yaim)*Game.tilesize+startx,(Game.player.position.y)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+              break;
+           }
+
+        if(Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible) //left branch
+        {
+          ctx.fillStyle = "rgba(0,150,0,0.5)";
+          ctx.fillRect((Game.player.position.x+2*yaim)*Game.tilesize+startx,(Game.player.position.y-1)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+          if(Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible &&
+              Game.map.tiles[(Game.player.position.y-2)*Game.map.columns+(Game.player.position.x+yaim)].accessible)
+              {
+                ctx.fillStyle = "rgba(0,150,0,0.5)";
+                ctx.fillRect((Game.player.position.x+yaim)*Game.tilesize+startx,(Game.player.position.y-2)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+              }
+              else
+              {
+                ctx.fillStyle = "rgba(150,0,0,0.5)";
+                ctx.fillRect((Game.player.position.x+yaim)*Game.tilesize+startx,(Game.player.position.y-2)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+              }
+        }
+        else
+        {
+          ctx.fillStyle = "rgba(0,150,0,0.5)";
+          ctx.fillRect((Game.player.position.x+2*yaim)*Game.tilesize+startx,(Game.player.position.y-1)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+        }
+
+        if(Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible) //right branch
+        {
+          ctx.fillStyle = "rgba(0,150,0,0.5)";
+          ctx.fillRect((Game.player.position.x+2*yaim)*Game.tilesize+startx,(Game.player.position.y+1)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+          if(Game.map.tiles[(Game.player.position.y+2)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible &&
+              Game.map.tiles[(Game.player.position.y+2)*Game.map.columns+(Game.player.position.x+yaim)].accessible)
+              {
+                ctx.fillStyle = "rgba(0,150,0,0.5)";
+                ctx.fillRect((Game.player.position.x+yaim)*Game.tilesize+startx,(Game.player.position.y+2)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+              }
+              else
+              {
+                ctx.fillStyle = "rgba(150,0,0,0.5)";
+                ctx.fillRect((Game.player.position.x+yaim)*Game.tilesize+startx,(Game.player.position.y+2)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+              }
+        }
+        else
+        {
+          ctx.fillStyle = "rgba(0,150,0,0.5)";
+          ctx.fillRect((Game.player.position.x+2*yaim)*Game.tilesize+startx,(Game.player.position.y+1)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+        }
+        break;
+      }
+      case "g3":
+      {
+
+        if(Game.map.tiles[(Game.player.position.y)*Game.map.columns+(Game.player.position.x+yaim)].accessible)//path in front of player
+           {
+             ctx.fillStyle = "rgba(0,150,0,0.5)";
+             ctx.fillRect((Game.player.position.x+yaim)*Game.tilesize+startx,(Game.player.position.y)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+           }
+           else
+           {
+              ctx.fillStyle = "rgba(150,0,0,0.5)"
+              ctx.fillRect((Game.player.position.x+yaim)*Game.tilesize+startx,(Game.player.position.y)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+              break;
+           }
+
+           if(Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+(Game.player.position.x+yaim)].accessible && //left branch
+              Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible)
+              {
+                ctx.fillStyle = "rgba(0,150,0,0.5)";
+                ctx.fillRect((Game.player.position.x+2*yaim)*Game.tilesize+startx,(Game.player.position.y-1)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                if(Game.map.tiles[(Game.player.position.y-2)*Game.map.columns+(Game.player.position.x+yaim)].accessible &&
+                  Game.map.tiles[(Game.player.position.y-2)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible &&
+                  Game.map.tiles[(Game.player.position.y-2)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
+                  {
+                    ctx.fillStyle = "rgba(0,150,0,0.5)";
+                    ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y-2)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                  }
+                  else
+                  {
+                    ctx.fillStyle = "rgba(150,0,0,0.5)";
+                    ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y-2)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                  }
+              }
+          else
+          {
+            ctx.fillStyle = "rgba(150,0,0,0.5)";
+            ctx.fillRect((Game.player.position.x+2*yaim)*Game.tilesize+startx,(Game.player.position.y-1)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+          }
+
+          if(Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+(Game.player.position.x+yaim)].accessible && //right branch
+             Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible)
+             {
+               ctx.fillStyle = "rgba(0,150,0,0.5)";
+               ctx.fillRect((Game.player.position.x+2*yaim)*Game.tilesize+startx,(Game.player.position.y+1)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+               if(Game.map.tiles[(Game.player.position.y+2)*Game.map.columns+(Game.player.position.x+yaim)].accessible &&
+                 Game.map.tiles[(Game.player.position.y+2)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible &&
+                 Game.map.tiles[(Game.player.position.y+2)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
+                 {
+                   ctx.fillStyle = "rgba(0,150,0,0.5)";
+                   ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y+2)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                 }
+                 else
+                 {
+                   ctx.fillStyle = "rgba(150,0,0,0.5)";
+                   ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y+2)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                 }
+             }
+         else
+         {
+           ctx.fillStyle = "rgba(150,0,0,0.5)";
+           ctx.fillRect((Game.player.position.x+2*yaim)*Game.tilesize+startx,(Game.player.position.y+1)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+         }
+        break;
+      }
+      case "t1":
+      case "t2":
+      case "t3":
+      {
+        if(Game.map.tiles[(Game.player.position.y)*Game.map.columns+(Game.player.position.x+yaim)].accessible &&
+            Game.map.tiles[(Game.player.position.y)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible &&
+            Game.map.tiles[(Game.player.position.y)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible &&
+            Game.map.tiles[(Game.player.position.y)*Game.map.columns+(Game.player.position.x+4*yaim)].accessible)
+          ctx.fillStyle = "rgba(0,150,0,0.5)";
+          else
+          ctx.fillStyle = "rgba(150,0,0,0.5)";
+          ctx.fillRect((Game.player.position.x+4*yaim)*Game.tilesize+startx,(Game.player.position.y)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
           break;
         }
     }
