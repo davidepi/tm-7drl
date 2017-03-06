@@ -18,6 +18,10 @@ const STAIRS = new Item(0,128,nextLevel);
 const FIRESHARD = new Item(0,160,increaseFire);
 const ICESHARD = new Item(32,160,increaseIce);
 const THUNDERSHARD = new Item(64,160,increaseThunder);
+const HOTWOOD = new Tile(true,32,96);
+const ASH = new Tile(true,64,96);
+const FIRE = new Tile(undefined,32,128);
+const ICE = new Tile(undefined,64,128);
 
 generateMap(0);
 render();
@@ -29,6 +33,12 @@ function endTurn()
     document.getElementById("fr").innerHTML = Game.player.fp+"%";
     document.getElementById("ic").innerHTML = Game.player.ip+"%";
     document.getElementById("th").innerHTML = Game.player.tp+"%";
+    for(var i=0;i<Game.hotwood.length;i++)
+    {
+      //TODO find a way to remove it
+      if(--Game.hotwood[i].value==0)
+        Game.map.tiles[Game.hotwood[i].pos]=ASH;
+    }
 }
 
 function generateMap(magnitude)
@@ -1138,7 +1148,7 @@ function cast(type)
             current_pos = (Game.aimed[i].y+offsety)*Game.map.columns+Game.aimed[i].x+offsetx;
         }
       }
-      else if(type.charAt(1)=='3') //tier 3 spell
+      else //tier 3 spell
       {
         if(tmp <50)//miss
         {
@@ -1153,7 +1163,46 @@ function cast(type)
       Game.objects[current_pos]=undefined;
 
     //TODO check if enemies and add damage
-    //TODO add side effects and sprites
+
+    //TODO sideeffects
+    switch(type.charAt(0))
+    {
+      case 'f':
+      {
+        if(Game.overlay[current_pos]==undefined)
+          Game.overlay[current_pos] = new Effect(FIRE,5,0);
+        else
+        {
+            if(Game.overlay[current_pos].type==1) //melt ice
+              Game.overlay[current_pos]=undefined;
+            else
+              Game.overlay[current_pos].value+=5; //increase fire duration
+          }
+        break;
+      }
+      case 'g':
+      {
+        if(Game.overlay[current_pos]==undefined)
+          Game.overlay[current_pos] = new Effect(ICE,5,1);
+        else
+        {
+            if(Game.overlay[current_pos].type==0) //extinguish fire
+              Game.overlay[current_pos]=undefined;
+          }
+        break;
+      }
+      case 't':
+      {
+        if(Game.map.tiles[current_pos]==WOOD) //incinerate the wood
+        {
+          Game.map.tiles[current_pos]=HOTWOOD;
+          Game.hotwood.push({pos:current_pos,value:10});
+        }
+        if(Game.overlay[current_pos]!=undefined) //remove ice or fire
+          Game.overlay[current_pos]=undefined;
+          break;
+      }
+    }
   }
 }
 

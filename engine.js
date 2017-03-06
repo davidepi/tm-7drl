@@ -19,6 +19,7 @@ var Game =
         selected:undefined,
         target:1, //0 - left, 1 - up, 2 - right, 3 - down
         aimed:[], //the cells where the spell will be cast. When aiming this array is populated, to avoid reprocessing the obstables again when casting
+        hotwood:[], //this require a special array, just to store the time remaining before it cools down
     }
 Game.spritesheet.src = "spritesheet.png";
 Game.size.offsetx = Math.floor(Game.size.width/Game.tilesize/2);
@@ -56,6 +57,14 @@ function Item(startx,starty,action)
     this.x = startx;
     this.y = starty;
     this.trigger = action;
+}
+
+function Effect(tile,intensity,type) //type: 0 = fire, 1= ice
+{
+  this.x = tile.x;
+  this.y = tile.y;
+  this.value = intensity;
+  this.type=type;
 }
 
 function Actor(posx,posy,maxhp,sprite,fire,ice,thunder)
@@ -125,6 +134,10 @@ function render()
                 if(obj != undefined)
                     ctx.drawImage(Game.spritesheet,obj.x,obj.y,Game.tilesize,Game.tilesize,mx*Game.tilesize+startx,my*Game.tilesize+starty,Game.tilesize,Game.tilesize);
             }
+
+            //TODO Xoverlay
+            if(Game.overlay[my*Game.map.columns+mx]!=undefined)
+              ctx.drawImage(Game.spritesheet,Game.overlay[my*Game.map.columns+mx].x,Game.overlay[my*Game.map.columns+mx].y,Game.tilesize,Game.tilesize,mx*Game.tilesize+startx,my*Game.tilesize+starty,Game.tilesize,Game.tilesize);
         }
 
     //drawplayer
@@ -159,6 +172,14 @@ function keybind(evt)
                     if(Game.player.position.x > 0 &&
                         Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x-1].accessible == true)
                     {
+                      //can't walk on ice
+                      if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x-1]!=undefined)
+                        if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x-1].type==1)
+                          {
+                            next_status = Status.MAP;
+                            break;
+                          }
+
                         Game.player.position.x--;
                         trigger_turn = true;
                     }
@@ -205,6 +226,14 @@ function keybind(evt)
                     if(Game.player.position.y > 0 &&
                         Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x].accessible == true)
                     {
+                      //can't walk on ice
+                      if(Game.overlay[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x]!=undefined)
+                        if(Game.overlay[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x].type==1)
+                        {
+                          next_status = Status.MAP;
+                          break;
+                        }
+
                         Game.player.position.y--;
                         trigger_turn = true;
                     }
@@ -252,6 +281,14 @@ function keybind(evt)
                     if(Game.player.position.x > 0 &&
                         Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x+1].accessible == true)
                     {
+                      //can't walk on ice
+                      if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x+1]!=undefined)
+                        if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x+1].type==1)
+                        {
+                          next_status = Status.MAP;
+                          break;
+                        }
+
                         Game.player.position.x++;
                         trigger_turn = true;
                     }
@@ -299,6 +336,14 @@ function keybind(evt)
                     if(Game.player.position.y > 0 &&
                         Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x].accessible == true)
                     {
+                      //can't walk on ice
+                      if(Game.overlay[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x]!=undefined)
+                        if(Game.overlay[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x].type==1)
+                        {
+                          next_status = Status.MAP;
+                          break;
+                        }
+
                         Game.player.position.y++;
                         trigger_turn = true;
                     }
