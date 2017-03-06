@@ -39,10 +39,11 @@ Math.random = function(min,max)
     return Math.seed%(max-min+1)+min;
 }
 
+/*
 console.log = function(string)
 {
     document.getElementById("console").innerHTML += "<div>"+string+"</div>";
-}
+}*/
 
 function Tile(accessible,startx,starty)
 {

@@ -33,6 +33,11 @@ function endTurn()
     document.getElementById("fr").innerHTML = Game.player.fp+"%";
     document.getElementById("ic").innerHTML = Game.player.ip+"%";
     document.getElementById("th").innerHTML = Game.player.tp+"%";
+
+    Game.overlay.map(propagate);
+    Game.overlay=[];
+    Game.overlay=Game.Xoverlay;
+    Game.Xoverlay=[];
 }
 
 function generateMap(magnitude)
@@ -1246,5 +1251,47 @@ function lord_tachanka()
 
 function propagate(item,index)
 {
-
+  if(item==undefined)
+    return undefined;
+  if(--item.value==0)
+  {
+    if(item.type==1)
+      return undefined;
+    else
+    {
+      Game.map.tiles[index]=ASH;
+      return undefined;
+    }
+  }
+  if(item.type==1) //ice
+    {
+        Game.Xoverlay[index] = item;
+    }
+  else
+  {
+    if(item.value==1) //too low, don't propagate
+     {
+       Game.Xoverlay[index] = item;
+     }
+     else
+     {
+       if(Math.random(1,100)<25) //propagate
+       {
+          var y = Math.random(-1,1);
+          var x = Math.random(-1,1);
+          var new_index = index+x+y*Game.map.columns;
+            if(Game.overlay[new_index]==undefined)
+            {
+              if(Game.map.tiles[new_index].accessible)
+                Game.Xoverlay[new_index] = new Effect(FIRE,8,0);
+            }
+            else if(Game.overlay[new_index].type==1)
+              Game.Xoverlay[new_index] = undefined;
+            else if(Game.Xoverlay[new_index]!=undefined) //could have died in the previous if, hence the check
+            Game.Xoverlay[new_index].value += Math.round(Game.overlay[index].value/2);
+       }
+      Game.Xoverlay[index] = item;
+     }
+  }
+  return undefined;
 }
