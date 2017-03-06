@@ -29,15 +29,26 @@ render();
 function endTurn()
 {
     document.getElementById("turn").innerHTML = ++Game.turn;
-    document.getElementById("hp").innerHTML = Game.player.curhp+"/"+Game.player.maxhp;
-    document.getElementById("fr").innerHTML = Game.player.fp+"%";
-    document.getElementById("ic").innerHTML = Game.player.ip+"%";
-    document.getElementById("th").innerHTML = Game.player.tp+"%";
-
     Game.overlay.map(propagate);
     Game.overlay=[];
     Game.overlay=Game.Xoverlay;
     Game.Xoverlay=[];
+    if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x]!=undefined)
+      if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x].type==0)
+      {
+        Game.player.curhp-=10;
+        console.log("Don't play with fire! You lose 10Hp");
+      }
+      document.getElementById("hp").innerHTML = Game.player.curhp+"/"+Game.player.maxhp;
+      document.getElementById("fr").innerHTML = Game.player.fp+"%";
+      document.getElementById("ic").innerHTML = Game.player.ip+"%";
+      document.getElementById("th").innerHTML = Game.player.tp+"%";
+      if(Game.player.curhp<1)
+      {
+        console.log("You diededed!!!")
+        return false;
+      }
+      return true;
 }
 
 function generateMap(magnitude)

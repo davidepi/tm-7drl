@@ -1,4 +1,4 @@
-var Status = Object.freeze({MAP:0,MENU:1,AIM:2,SKILLMENU:3,WAIT:4});
+var Status = Object.freeze({MAP:0,MENU:1,AIM:2,SKILLMENU:3,WAIT:4,DEAD:9});
 var Game =
     {
         kstatus:Status.MAP,
@@ -39,11 +39,11 @@ Math.random = function(min,max)
     return Math.seed%(max-min+1)+min;
 }
 
-/*
+
 console.log = function(string)
 {
     document.getElementById("console").innerHTML += "<div>"+string+"</div>";
-}*/
+}
 
 function Tile(accessible,startx,starty)
 {
@@ -152,7 +152,7 @@ function render()
 
 function keybind(evt)
 {
-    if(Game.kstatus == Status.WAIT)
+    if(Game.kstatus == Status.WAIT || Game.kstatus == Status.DEAD)
         return;
     var current_status = Game.kstatus;
     var next_status;
@@ -465,7 +465,9 @@ function keybind(evt)
         var current_cell_object = Game.objects[Game.player.position.y*Game.map.columns+Game.player.position.x];
         if(current_cell_object != undefined)
             current_cell_object.trigger();
-        endTurn();
+        var res = endTurn();
+        if(!res)
+        next_status = Status.DEAD;
         render();
     }
     Game.kstatus = next_status;
