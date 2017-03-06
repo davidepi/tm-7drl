@@ -18,7 +18,7 @@ const STAIRS = new Item(0,128,nextLevel);
 const FIRESHARD = new Item(0,160,increaseFire);
 const ICESHARD = new Item(32,160,increaseIce);
 const THUNDERSHARD = new Item(64,160,increaseThunder);
-const HOTWOOD = new Tile(true,32,96);
+const HOTWOOD = new Tile(true,32,96); //unused
 const ASH = new Tile(true,64,96);
 const FIRE = new Tile(undefined,32,128);
 const ICE = new Tile(undefined,64,128);
@@ -74,14 +74,14 @@ function generateMap(magnitude)
             x = Math.random(1,Game.map.columns-2);
             y = Math.random(1,Game.map.rows-2);
         }
-        while(x!=Game.player.position.x && x!=Game.player.position.y && Game.objects[y*Game.map.columns+x]!=undefined)
+        while((x==Game.player.position.x && y==Game.player.position.y) || Game.objects[y*Game.map.columns+x]!=undefined)
             Game.objects[y*Game.map.columns+x] = STAIRS;
         do
         {
             x = Math.random(1,Game.map.columns-2);
             y = Math.random(1,Game.map.rows-2);
         }
-        while(x!=Game.player.position.x && y!=Game.player.position.y && Game.objects[y*Game.map.columns+x]!=undefined)
+        while((x==Game.player.position.x && y==Game.player.position.y) || Game.objects[y*Game.map.columns+x]!=undefined)
             var a = Math.random(0,2);
         switch(a)
         {
@@ -1169,22 +1169,21 @@ function cast(type)
     }
 
     //destroy objects on hit
-    if(Game.objects[current_pos]!=undefined)
+    if(Game.objects[current_pos]!=undefined && Game.objects[current_pos]!=STAIRS)
       Game.objects[current_pos]=undefined;
 
     //TODO check if enemies and add damage
 
-    //TODO sideeffects
     switch(type.charAt(0))
     {
       case 'f':
       {
         if(Game.overlay[current_pos]==undefined)
         {
-          if(Game.map.tiles[current_pos]==WOOD) //burn for 7 turns +1 because it decrements at the end of this one
-            Game.overlay[current_pos]=new Effect(FIRE,8,0);
-          else //burn for 2 turn
-            Game.overlay[current_pos]=new Effect(FIRE,2,0);
+          if(Game.map.tiles[current_pos]==WOOD) //burn for 9 turns +1 because it decrements at the end of this one
+            Game.overlay[current_pos]=new Effect(FIRE,10,0);
+          else //burn for 4 turn
+            Game.overlay[current_pos]=new Effect(FIRE,5,0);
 
         }
         else
@@ -1275,7 +1274,7 @@ function propagate(item,index)
      }
      else
      {
-       if(Math.random(1,100)<25) //propagate
+       if(Math.random(1,100)<30) //propagate
        {
           var y = Math.random(-1,1);
           var x = Math.random(-1,1);
@@ -1283,7 +1282,14 @@ function propagate(item,index)
             if(Game.overlay[new_index]==undefined)
             {
               if(Game.map.tiles[new_index].accessible)
-                Game.Xoverlay[new_index] = new Effect(FIRE,8,0);
+                {
+                  if(Game.map.tiles[new_index]==WOOD)
+                  Game.Xoverlay[new_index] = new Effect(FIRE,10,0);
+                  else
+                  Game.Xoverlay[new_index] = new Effect(FIRE,3,0);
+                  if(Game.objects[new_index]!=undefined && Game.objects[new_index]!=STAIRS)
+                  Game.objects[new_index]=undefined;
+                }
             }
             else if(Game.overlay[new_index].type==1)
               Game.Xoverlay[new_index] = undefined;

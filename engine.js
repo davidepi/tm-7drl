@@ -135,7 +135,6 @@ function render()
                     ctx.drawImage(Game.spritesheet,obj.x,obj.y,Game.tilesize,Game.tilesize,mx*Game.tilesize+startx,my*Game.tilesize+starty,Game.tilesize,Game.tilesize);
             }
 
-            //TODO Xoverlay
             if(Game.overlay[my*Game.map.columns+mx]!=undefined)
               ctx.drawImage(Game.spritesheet,Game.overlay[my*Game.map.columns+mx].x,Game.overlay[my*Game.map.columns+mx].y,Game.tilesize,Game.tilesize,mx*Game.tilesize+startx,my*Game.tilesize+starty,Game.tilesize,Game.tilesize);
         }
