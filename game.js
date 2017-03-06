@@ -1187,7 +1187,7 @@ function cast(type)
             if(Game.overlay[current_pos].type==1) //melt ice
               Game.overlay[current_pos]=undefined;
             else
-              Game.overlay[current_pos].value+=5; //increase fire duration
+              Game.overlay[current_pos].value+=3; //increase fire duration
           }
         break;
       }
@@ -1199,6 +1199,8 @@ function cast(type)
         {
             if(Game.overlay[current_pos].type==0) //extinguish fire
               Game.overlay[current_pos]=undefined;
+            else if(Game.overlay[current_pos].type==1)
+              Game.overlay[current_pos].value=101; //compact ice
           }
         break;
       }
@@ -1240,4 +1242,9 @@ function lord_tachanka()
   document.getElementById("t2").innerHTML = "Bolt";
   document.getElementById("t3").innerHTML = "Lightning";
   Game.kstatus = Status.MAP;
+}
+
+function propagate(item,index)
+{
+
 }
