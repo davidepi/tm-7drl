@@ -33,12 +33,6 @@ function endTurn()
     document.getElementById("fr").innerHTML = Game.player.fp+"%";
     document.getElementById("ic").innerHTML = Game.player.ip+"%";
     document.getElementById("th").innerHTML = Game.player.tp+"%";
-    for(var i=0;i<Game.hotwood.length;i++)
-    {
-      //TODO find a way to remove it
-      if(--Game.hotwood[i].value==0)
-        Game.map.tiles[Game.hotwood[i].pos]=ASH;
-    }
 }
 
 function generateMap(magnitude)
@@ -82,7 +76,7 @@ function generateMap(magnitude)
             x = Math.random(1,Game.map.columns-2);
             y = Math.random(1,Game.map.rows-2);
         }
-        while(x!=Game.player.position.x && x!=Game.player.position.y && Game.objects[y*Game.map.columns+x]!=undefined)
+        while(x!=Game.player.position.x && y!=Game.player.position.y && Game.objects[y*Game.map.columns+x]!=undefined)
             var a = Math.random(0,2);
         switch(a)
         {
@@ -106,15 +100,15 @@ function nextLevel()
         switch(Game.level)
     {
             case 0:console.log("Please, collect the shard first :)");break;
-            case 1:console.log("You should defeat all your opponents to proceed!");break;
+            case 1:
             case 2:
-            case 3:
-            case 4:console.log("You have to kill every enemy mage before continuing");break;
+            case 3:console.log("You should defeat all your opponents to proceed!");break;
+            case 4:
             case 5:
-            case 6:
-            case 7:console.log("You must slaughter every organic creature on sight before searching for others");break;
+            case 6:console.log("You have to kill every enemy mage before continuing");break;
+            case 7:
             case 8:
-            case 9:
+            case 9:console.log("You must slaughter every organic creature on sight before searching for others");break;
     }
 }
 
@@ -1125,18 +1119,17 @@ function cast(type)
     {
       var tmp = Math.random(1,100),offsetx,offsety;
 
-      do //generate the alterated position in case the lightning spell misses
-      {  //yes, even if it strike correctly
-          offsetx = Math.random(-1,1);
-          offsety = Math.random(-1,1);
-      }
-      while(offsetx!=0||offsety!=0);
-
       if(type.charAt(1)=='1') //tier 1 spell
       {
         if(tmp < 30) //miss
         {
             console.log("Your Spark spell missed the target");
+            do //generate the alterated position in case the lightning spell misses
+            {
+                offsetx = Math.random(-1,1);
+                offsety = Math.random(-1,1);
+            }
+            while(offsetx==0&&offsety==0);
             current_pos = (Game.aimed[i].y+offsety)*Game.map.columns+Game.aimed[i].x+offsetx;
         }
       }
@@ -1145,6 +1138,12 @@ function cast(type)
         if(tmp < 40) //miss
         {
             console.log("Your Bolt spell missed the target");
+            do //generate the alterated position in case the lightning spell misses
+            {
+                offsetx = Math.random(-1,1);
+                offsety = Math.random(-1,1);
+            }
+            while(offsetx==0&&offsety==0);
             current_pos = (Game.aimed[i].y+offsety)*Game.map.columns+Game.aimed[i].x+offsetx;
         }
       }
@@ -1153,6 +1152,12 @@ function cast(type)
         if(tmp <50)//miss
         {
             console.log("Your Lightning spell missed the target");
+            do //generate the alterated position in case the lightning spell misses
+            {
+                offsetx = Math.random(-1,1);
+                offsety = Math.random(-1,1);
+            }
+            while(offsetx==0&&offsety==0);
             current_pos = (Game.aimed[i].y+offsety)*Game.map.columns+Game.aimed[i].x+offsetx;
         }
       }
@@ -1170,7 +1175,13 @@ function cast(type)
       case 'f':
       {
         if(Game.overlay[current_pos]==undefined)
-          Game.overlay[current_pos] = new Effect(FIRE,5,0);
+        {
+          if(Game.map.tiles[current_pos]==WOOD) //burn for 7 turns +1 because it decrements at the end of this one
+            Game.overlay[current_pos]=new Effect(FIRE,8,0);
+          else //burn for 2 turn
+            Game.overlay[current_pos]=new Effect(FIRE,2,0);
+
+        }
         else
         {
             if(Game.overlay[current_pos].type==1) //melt ice
@@ -1183,7 +1194,7 @@ function cast(type)
       case 'g':
       {
         if(Game.overlay[current_pos]==undefined)
-          Game.overlay[current_pos] = new Effect(ICE,5,1);
+          Game.overlay[current_pos] = new Effect(ICE,101,1);
         else
         {
             if(Game.overlay[current_pos].type==0) //extinguish fire
@@ -1194,10 +1205,7 @@ function cast(type)
       case 't':
       {
         if(Game.map.tiles[current_pos]==WOOD) //incinerate the wood
-        {
-          Game.map.tiles[current_pos]=HOTWOOD;
-          Game.hotwood.push({pos:current_pos,value:10});
-        }
+          Game.map.tiles[current_pos]=ASH;
         if(Game.overlay[current_pos]!=undefined) //remove ice or fire
           Game.overlay[current_pos]=undefined;
           break;

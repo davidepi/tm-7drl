@@ -19,7 +19,6 @@ var Game =
         selected:undefined,
         target:1, //0 - left, 1 - up, 2 - right, 3 - down
         aimed:[], //the cells where the spell will be cast. When aiming this array is populated, to avoid reprocessing the obstables again when casting
-        hotwood:[], //this require a special array, just to store the time remaining before it cools down
     }
 Game.spritesheet.src = "spritesheet.png";
 Game.size.offsetx = Math.floor(Game.size.width/Game.tilesize/2);
@@ -450,6 +449,13 @@ function keybind(evt)
         case 68: console.log("key d");break;
         case 115: //s,S
         case 83: console.log("key s");break;
+        case 116: //t,T
+        case 84:
+        {
+          if(current_status==Status.MAP)
+            trigger_turn = true;
+            next_status = current_status;break;
+        }
         default:break;
     }
 
