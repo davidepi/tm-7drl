@@ -19,6 +19,7 @@ var Game =
         selected:undefined,
         target:1, //0 - left, 1 - up, 2 - right, 3 - down
         aimed:[], //the cells where the spell will be cast. When aiming this array is populated, to avoid reprocessing the obstables again when casting
+        rooms:[],
     }
 Game.spritesheet.src = "spritesheet.png";
 Game.size.offsetx = Math.floor(Game.size.width/Game.tilesize/2);

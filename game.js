@@ -54,63 +54,23 @@ function endTurn()
 function generateMap(magnitude)
 {
     Game.kstatus = Status.WAIT;
-    if(!magnitude) //first level
+    Game.map.tiles = [];
+    Game.npcs = [];
+    Game.objects = [];
+    Game.overlay = [];
+    switch(magnitude)
     {
-        Game.map.rows = Math.random(10,20);
-        Game.map.columns = Math.random(10,20);
-        for(var y=0;y<Game.map.rows;y++)
-            for(var x=0;x<Game.map.columns;x++)
-            {
-                Game.map.hidden[y*Game.map.columns+x] = 0;
-                if(x==0 || x==Game.map.columns-1)
-                    Game.map.tiles[y*Game.map.columns+x] = VWALL;
-                else if(y==0 || y==Game.map.rows-1)
-                    Game.map.tiles[y*Game.map.columns+x] = HWALL;
-                else
-                    Game.map.tiles[y*Game.map.columns+x] = WOOD;
-            }
-        Game.map.tiles[0] = TLCORNER;
-        Game.map.tiles[Game.map.columns-1]=TRCORNER;
-        Game.map.tiles[(Game.map.rows-1)*(Game.map.columns)] = BLCORNER;
-        Game.map.tiles[(Game.map.rows-1)*(Game.map.columns)+Game.map.columns-1] = BRCORNER;
-
-        //player position
-        Game.player.position.x = Math.random(1,Game.map.columns-2);
-        Game.player.position.y = Game.map.rows-2;
-
-        //stairs
-        var x,y;
-        do
-        {
-            x = Math.random(1,Game.map.columns-2);
-            y = Math.random(1,Game.map.rows-2);
-        }
-        while((x==Game.player.position.x && y==Game.player.position.y) || Game.objects[y*Game.map.columns+x]!=undefined)
-            Game.objects[y*Game.map.columns+x] = STAIRS;
-        do
-        {
-            x = Math.random(1,Game.map.columns-2);
-            y = Math.random(1,Game.map.rows-2);
-        }
-        while((x==Game.player.position.x && y==Game.player.position.y) || Game.objects[y*Game.map.columns+x]!=undefined)
-            var a = Math.random(0,2);
-        switch(a)
-        {
-            case 0: Game.objects[y*Game.map.columns+x] = FIRESHARD;break;
-            case 1: Game.objects[y*Game.map.columns+x] = ICESHARD;break;
-            case 2: Game.objects[y*Game.map.columns+x] = THUNDERSHARD;break;
-        }
-
-
+      case 0:generateBase(10,20,10,20,0);document.getElementById("title").innerHTML = 'Tower of Magi - Ground Floor';break;
+      case 1:generateBase(15,25,15,25,2);document.getElementById("title").innerHTML = 'First Floor';break;
+      case 2:generateBase(20,30,20,30,3);document.getElementById("title").innerHTML = 'Second Floor';break;
     }
-    Game.kstatus = Status.MAP;
 }
 
 function nextLevel()
 {
     if(Game.enemies_left == 0)
     {
-        console.log("To the next level!");
+        generateMap(++Game.level);
     }
     else
         switch(Game.level)
@@ -1311,4 +1271,112 @@ function propagate(item,index)
      }
   }
   return undefined;
+}
+
+function generateBase(minx,maxx,miny,maxy,maxiteration)
+{
+  Game.map.rows = Math.random(minx,maxx);
+  Game.map.columns = Math.random(miny,maxy);
+  for(var y=0;y<Game.map.rows;y++)
+      for(var x=0;x<Game.map.columns;x++)
+      {
+          Game.map.hidden[y*Game.map.columns+x] = 0;
+          if(x==0 || x==Game.map.columns-1)
+              Game.map.tiles[y*Game.map.columns+x] = VWALL;
+          else if(y==0 || y==Game.map.rows-1)
+              Game.map.tiles[y*Game.map.columns+x] = HWALL;
+          else
+              Game.map.tiles[y*Game.map.columns+x] = WOOD;
+      }
+  Game.map.tiles[0] = TLCORNER;
+  Game.map.tiles[Game.map.columns-1]=TRCORNER;
+  Game.map.tiles[(Game.map.rows-1)*(Game.map.columns)] = BLCORNER;
+  Game.map.tiles[(Game.map.rows-1)*(Game.map.columns)+Game.map.columns-1] = BRCORNER;
+
+  //Math.random(0,1)==0:splitV():splitH();
+  splitH(0,0,Game.map.columns-1,Game.map.rows-1,0,0,maxiteration);
+
+  //player position
+  Game.player.position.x = Math.random(1,Game.map.columns-2);
+  Game.player.position.y = Game.map.rows-2;
+
+  //stairs
+  var x,y;
+  do
+  {
+      x = Math.random(1,Game.map.columns-2);
+      y = Math.random(1,Game.map.rows-2);
+  }
+  while((x==Game.player.position.x && y==Game.player.position.y) || !Game.map.tiles[y*Game.map.columns+x].accessible || Game.objects[y*Game.map.columns+x]!=undefined)
+      Game.objects[y*Game.map.columns+x] = STAIRS;
+  do
+  {
+      x = Math.random(1,Game.map.columns-2);
+      y = Math.random(1,Game.map.rows-2);
+  }
+  while((x==Game.player.position.x && y==Game.player.position.y) || !Game.map.tiles[y*Game.map.columns+x].accessible || Game.objects[y*Game.map.columns+x]!=undefined)
+      var a = Math.random(0,2);
+  switch(a)
+  {
+      case 0: Game.objects[y*Game.map.columns+x] = FIRESHARD;break;
+      case 1: Game.objects[y*Game.map.columns+x] = ICESHARD;break;
+      case 2: Game.objects[y*Game.map.columns+x] = THUNDERSHARD;break;
+  }
+  Game.kstatus = Status.MAP;
+}
+
+function splitV(sx,sy,ex,ey,entry,iteration,maxiteration)
+{
+  if(++iteration>maxiteration || (ex-sx)<5 || ((ex-sx)*(ey-sy)<16))
+    return;
+  var xsplit;
+  do
+    xsplit = Math.random(sx,ex);
+  while(xsplit<(sx+5) || xsplit>(ex-5));
+  var offsplit = sx+xsplit;
+  if(Game.map.tiles[(sy-1)*Game.map.columns+offsplit]!=TUP)
+    Game.map.tiles[sy*Game.map.columns+offsplit] = TDOWN;
+  else
+    Game.map.tiles[sy*Game.map.columns+offsplit] = XWALL; //if connecting to another T-shape generate a X-shape instead
+
+  if(Game.map.tiles[(ey+1)*Game.map.columns+offsplit]!=TDOWN)
+    Game.map.tiles[ey*Game.map.columns+offsplit] = TUP;
+  else
+    Game.map.tiles[ey*Game.map.columns+offsplit] = XWALL;
+  for(var my=sy+1;my<ey;my++)
+    Game.map.tiles[my*Game.map.columns+offsplit] = VWALL;
+
+    Game.map.tiles[(sy+Math.random(sy+1,ey-1))*Game.map.columns+offsplit] = VDOOR;
+
+    splitH(sx,sy,xsplit,ey,undefined,iteration,maxiteration);
+    splitH(xsplit,sy,ex,ey,undefined,iteration,maxiteration);
+}
+
+function splitH(sx,sy,ex,ey,entry,iteration,maxiteration)
+{
+  if(++iteration>maxiteration || (ey-sy)<5 || ((ex-sx)*(ey-sy)<16))
+    return;
+  var ysplit;
+  do
+    ysplit = Math.random(sy,ey);
+  while(ysplit<(sy+5) || ysplit>(ey-5));
+  var offsplit = sy+ysplit;
+
+  if(Game.map.tiles[offsplit*Game.map.columns+sx-1]!=TLEFT)
+    Game.map.tiles[offsplit*Game.map.columns+sx] = TRIGHT;
+  else
+    Game.map.tiles[offsplit*Game.map.columns+sx] = XWALL;
+
+  if(Game.map.tiles[offsplit*Game.map.columns+sx+1]!=TRIGHT)
+    Game.map.tiles[offsplit*Game.map.columns+ex] = TLEFT;
+    else
+      Game.map.tiles[offsplit*Game.map.columns+sx] = XWALL;
+
+  for(var mx=sx+1;mx<ex;mx++)
+    Game.map.tiles[offsplit*Game.map.columns+mx] = HWALL;
+
+Game.map.tiles[offsplit*Game.map.columns+sx+Math.random(sx+1,ex-1)] = HDOOR;
+
+  splitV(sx,sy,ex,ysplit,undefined,iteration,maxiteration);
+  splitV(sx,ysplit,ex,ey,undefined,iteration,maxiteration);
 }
