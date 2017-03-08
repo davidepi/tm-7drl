@@ -1,3 +1,4 @@
+"use strict";
 var Status = Object.freeze({MAP:0,MENU:1,AIM:2,SKILLMENU:3,WAIT:4,DEAD:9});
 var Game =
     {
@@ -7,7 +8,7 @@ var Game =
         tilesize:32,
         size:{width:800,height:600,offsetx:undefined,offsety:undefined},
         spritesheet:new Image(),
-        map:{tiles:[],hidden:[],rows:0,columns:0},
+        map:{tiles:[],hidden:[],rows:0,columns:0,rooms:[]},
         overlay:[],
         Xoverlay:[], //overlay next turn
         objects:[],
@@ -20,7 +21,6 @@ var Game =
         skillselected:undefined,
         target:1, //0 - left, 1 - up, 2 - right, 3 - down
         aimed:[], //the cells where the spell will be cast. When aiming this array is populated, to avoid reprocessing the obstables again when casting
-        rooms:[],
     }
 Game.spritesheet.src = "spritesheet.png";
 Game.size.offsetx = Math.floor(Game.size.width/Game.tilesize/2);
@@ -217,6 +217,17 @@ function keybind(evt)
                   force_redraw = true;
                   Game.target = 0;
                 }
+                else if(current_status == Status.SKILLMENU)
+                {
+                    next_status = Status.SKILLMENU;
+                    var currentselec = parseInt(Game.skillselected.substring(1));
+                    if(currentselec%4==0)
+                        break;
+                    document.getElementById(Game.skillselected).classList.remove("selected");
+                    Game.skillselected = "s"+--currentselec;
+                    document.getElementById(Game.skillselected).className+=" selected";
+                    document.getElementById("skilldescription").innerHTML = Strings.skilldesc[currentselec];
+                }
                 break;
             }
         case 38: //Key up
@@ -270,6 +281,18 @@ function keybind(evt)
                   next_status = Status.AIM;
                   force_redraw = true;
                   Game.target = 1;
+                }
+                else if(current_status == Status.SKILLMENU)
+                {
+                    next_status = Status.SKILLMENU;
+                    var currentselec = parseInt(Game.skillselected.substring(1));
+                    if(currentselec<4)
+                        break;
+                    document.getElementById(Game.skillselected).classList.remove("selected");
+                    currentselec-=4
+                    Game.skillselected = "s"+currentselec;
+                    document.getElementById(Game.skillselected).className+=" selected";
+                    document.getElementById("skilldescription").innerHTML = Strings.skilldesc[currentselec];
                 }
                 break;
 
@@ -326,6 +349,17 @@ function keybind(evt)
                   force_redraw = true;
                   Game.target = 2;
                 }
+                else if(current_status == Status.SKILLMENU)
+                {
+                    next_status = Status.SKILLMENU;
+                    var currentselec = parseInt(Game.skillselected.substring(1));
+                    if(currentselec%4==3)
+                        break;
+                    document.getElementById(Game.skillselected).classList.remove("selected");
+                    Game.skillselected = "s"+(++currentselec);
+                    document.getElementById(Game.skillselected).className+=" selected";
+                    document.getElementById("skilldescription").innerHTML = Strings.skilldesc[currentselec];
+                }
                 break;
 
             }
@@ -380,6 +414,18 @@ function keybind(evt)
                   next_status = Status.AIM;
                   force_redraw = true;
                   Game.target = 3;
+                }
+                else if(current_status == Status.SKILLMENU)
+                {
+                    next_status = Status.SKILLMENU;
+                    var currentselec = parseInt(Game.skillselected.substring(1));
+                    if(currentselec>15)
+                        break;
+                    document.getElementById(Game.skillselected).classList.remove("selected");
+                    currentselec+=4
+                    Game.skillselected = "s"+currentselec;
+                    document.getElementById(Game.skillselected).className+=" selected";
+                    document.getElementById("skilldescription").innerHTML = Strings.skilldesc[currentselec];
                 }
                 break;
 

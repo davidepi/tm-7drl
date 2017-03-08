@@ -88,7 +88,7 @@ h1
 }
 .selected
 {
-  color: yellow;
+  color: yellow !important;
 }
 
 #skillbg

@@ -2,7 +2,7 @@ var Strings =
 {
   skilldesc:
   [
-      "You remember your old cousin, that used you as a punching bag for eight long years. You fear him then and you fear him now, but somehow you manage to survive and all the kicks you received formed your body. Every floor up you gain 10% of your max HP as a permanent bonus health",
+      "You remember your old cousin, that used you as a punching bag for eight long years. You feared him then and you fear him now, but somehow you manage to survive and all the kicks you received formed your body. Every floor up you gain 10% of your max HP as a permanent bonus health",
       "They say \"Knowledge is power\" and you assimilated very well that concept in your years at the Magic Academy. You can now somehow increase your magic power over the limit of 300%",
   ]
 }
