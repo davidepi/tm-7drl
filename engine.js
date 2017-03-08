@@ -41,6 +41,7 @@ Math.random = function(min,max)
     return Math.seed%(max-min+1)+min;
 }
 
+var debug = console.log;
 
 console.log = function(string)
 {
@@ -533,6 +534,33 @@ function keybind(evt)
                   document.getElementById(Game.selected).className = "";
                   next_status = Status.MAP;
                 }
+                else if(current_status == Status.SKILLMENU)
+                {
+                    next_status = Status.SKILLMENU;
+                    var sselected = parseInt(Game.skillselected.substring(1));
+                    var floorsel = Math.floor(sselected/4);
+                    if(floorsel==0 && Game.level<1 ||
+                       floorsel==1 && Game.level<3 ||
+                       floorsel==2 && Game.level<5 ||
+                       floorsel==3 && Game.level<7 ||
+                       floorsel==4 && Game.level<9) //level unmet
+                        break;
+
+                    floorsel*=4
+                    var floorselmul = floorsel*=4;
+                    if(Game.skills[floorselmul++] == 1 ||
+                        Game.skills[floorselmul++] == 1 ||
+                        Game.skills[floorselmul++] == 1 ||
+                        Game.skills[floorselmul++] == 1) //already one skill selected
+                        break;
+                        
+                    Game.skills[sselected] = 1;
+                    document.getElementById("s"+floorsel++).className="locked";
+                    document.getElementById("s"+floorsel++).className="locked";
+                    document.getElementById("s"+floorsel++).className="locked";
+                    document.getElementById("s"+floorsel++).className="locked";
+                    document.getElementById(Game.skillselected).className="unlocked";
+                }
                 break;
             }
         case 120: //x,X
@@ -544,6 +572,14 @@ function keybind(evt)
                     force_redraw = true;
                     document.getElementById(Game.selected).className = '';
                     Game.selected = undefined;
+                }
+                else if(current_status == Status.SKILLMENU)
+                {
+                    next_status = Status.MAP;
+                    document.getElementById("skillmenu").style.display="none";
+                    document.getElementById("skillbg").style.display="none";
+                    document.getElementById(Game.skillselected).classList.remove("selected");
+                    Game.skillselected=undefined;
                 }
                 else
                 {
@@ -560,6 +596,7 @@ function keybind(evt)
               next_status = Status.MAP;
               document.getElementById("skillmenu").style.display="none";
               document.getElementById("skillbg").style.display="none";
+              document.getElementById(Game.skillselected).classList.remove("selected");
               Game.skillselected=undefined;
           }
           else
@@ -573,7 +610,7 @@ function keybind(evt)
               Game.selected = undefined;
             }
             Game.skillselected="s0";
-            document.getElementById(Game.skillselected).className = 'selected';
+            document.getElementById(Game.skillselected).className += ' selected';
             document.getElementById("skilldescription").innerHTML = Strings.skilldesc[0];
             force_redraw = true; //to clear green tiles if one was aiming
           }
