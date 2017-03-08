@@ -22,6 +22,8 @@ const HOTWOOD = new Tile(true,32,96); //unused
 const ASH = new Tile(true,64,96);
 const FIRE = new Tile(undefined,32,128);
 const ICE = new Tile(undefined,64,128);
+const HEART = new Item(96,128,increaseHealth);
+const TRAP = new Tile(true,128,96);
 
 generateMap(0);
 render();
@@ -297,6 +299,14 @@ function increaseThunder()
 
     //remove from map
     Game.objects[Game.player.position.y*Game.map.columns+Game.player.position.x] = undefined;
+}
+
+function increaseHealth()
+{
+    Game.player.curhp += 50;
+    if(Game.player.curhp == Game.player.maxhp)
+        Game.player.curhp = Game.player.maxhp;
+    Game.objects[Game.player.position*y*Game.map.columns+Game.player.position.x] = undefined;
 }
 
 function aim(spell,startx,starty)
