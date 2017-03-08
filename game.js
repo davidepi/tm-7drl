@@ -1,4 +1,4 @@
-Math.seed(Math.floor(new Date().getTime()));
+seed = Math.seed(Math.floor(new Date().getTime()));
 const WATER = new Tile(true,32,96);
 const WOOD = new Tile(true,0,96);
 const TLCORNER = new Tile(false,160,32);

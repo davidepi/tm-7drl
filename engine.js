@@ -199,9 +199,43 @@ function keybind(evt)
                         case "g1":next = "f1";unlocked = Game.abilities[0];break;
                         case "g2":next = "f2";unlocked = Game.abilities[3];break;
                         case "g3":next = "f3";unlocked = Game.abilities[6];break;
-                        case "t1":next = "g1";unlocked = Game.abilities[1];break;
-                        case "t2":next = "g2";unlocked = Game.abilities[4];break;
-                        case "t3":next = "g3";unlocked = Game.abilities[7];break;
+                        case "t1":
+ {
+                                unlocked = Game.abilities[1];
+                                if(unlocked)
+                                    next="g1";
+                                else
+                                {
+                                    unlocked = Game.abilities[0];
+                                    next="f1";
+                                }
+                                break;
+                            }
+
+                        case "t2":
+ {
+                                unlocked = Game.abilities[4];
+                                if(unlocked)
+                                    next="g2";
+                                else
+                                {
+                                    unlocked = Game.abilities[3];
+                                    next="f2";
+                                }
+                                break;
+                            }
+                        case "t3":
+                                 {
+                                unlocked = Game.abilities[7];
+                                if(unlocked)
+                                    next="g3";
+                                else
+                                {
+                                    unlocked = Game.abilities[6];
+                                    next="f3";
+                                }
+                                break;
+                            }
                     }
                     if(unlocked)
                     {
@@ -323,11 +357,45 @@ function keybind(evt)
                     //this is horseshit, but It's 3AM and I don't want to think
                     //abount something better
                     var next,unlocked;
+                    next_status = Status.MENU;
                     switch(Game.selected)
                     {
-                        case "f1":next = "g1";unlocked = Game.abilities[1];break;
-                        case "f2":next = "g2";unlocked = Game.abilities[4];break;
-                        case "f3":next = "g3";unlocked = Game.abilities[7];break;
+                        case "f1":
+                            {
+                                unlocked = Game.abilities[1];
+                                if(unlocked)
+                                    next="g1";
+                                else
+                                {
+                                    unlocked = Game.abilities[2];
+                                    next="t1";
+                                }
+                                break;
+                            }
+                        case "f2":
+                            {
+                                unlocked = Game.abilities[4];
+                                if(unlocked)
+                                    next="g2";
+                                else
+                                {
+                                    unlocked = Game.abilities[5];
+                                    next="t2";
+                                }
+                                break;
+                            }
+                        case "f3":
+                             {
+                                unlocked = Game.abilities[7];
+                                if(unlocked)
+                                    next="g3";
+                                else
+                                {
+                                    unlocked = Game.abilities[8];
+                                    next="t3";
+                                }
+                                break;
+                            }
                         case "g1":next = "t1";unlocked = Game.abilities[2];break;
                         case "g2":next = "t2";unlocked = Game.abilities[5];break;
                         case "g3":next = "t3";unlocked = Game.abilities[8];break;
@@ -341,7 +409,6 @@ function keybind(evt)
                         Game.selected = next;
                         document.getElementById(Game.selected).className = 'selected';
                     }
-                    next_status = Status.MENU;
                 }
                 else if(current_status == Status.AIM)
                 {
@@ -529,7 +596,11 @@ function keybind(evt)
             trigger_turn = true;
             next_status = current_status;break;
         }
-        default:break;
+        default:
+        {
+            next_status = current_status;
+            break;
+        }
     }
 
     if(trigger_turn)
