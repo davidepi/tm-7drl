@@ -17,6 +17,7 @@ var Game =
         level:0,
         enemies_left:1,
         selected:undefined,
+        skillselected:undefined,
         target:1, //0 - left, 1 - up, 2 - right, 3 - down
         aimed:[], //the cells where the spell will be cast. When aiming this array is populated, to avoid reprocessing the obstables again when casting
         rooms:[],
@@ -439,7 +440,32 @@ function keybind(evt)
                 break;
             }
         case 107: //k,K
-        case 75: console.log("key k");break;
+        case 75:
+        {
+          if(current_status==Status.SKILLMENU)
+          {
+              next_status = Status.MAP;
+              document.getElementById("skillmenu").style.display="none";
+              document.getElementById("skillbg").style.display="none";
+              Game.skillselected=undefined;
+          }
+          else
+          {
+            next_status = Status.SKILLMENU;
+            document.getElementById("skillmenu").style.display="block";
+            document.getElementById("skillbg").style.display="block";
+            if(Game.selected!=undefined)
+            {
+              document.getElementById(Game.selected).className = '';
+              Game.selected = undefined;
+            }
+            Game.skillselected="s0";
+            document.getElementById(Game.skillselected).className = 'selected';
+            document.getElementById("skilldescription").innerHTML = Strings.skilldesc[0];
+            force_redraw = true; //to clear green tiles if one was aiming
+          }
+          break;
+        }
         case 108: //l,L
         case 76: console.log("key L");break;
         case 97: //a,A

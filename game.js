@@ -60,9 +60,15 @@ function generateMap(magnitude)
     Game.overlay = [];
     switch(magnitude)
     {
-      case 0:generateBase(10,20,10,20,0);document.getElementById("title").innerHTML = 'Tower of Magi - Ground Floor';break;
       case 1:generateBase(15,25,15,25,2);document.getElementById("title").innerHTML = 'First Floor';break;
       case 2:generateBase(20,30,20,30,3);document.getElementById("title").innerHTML = 'Second Floor';break;
+      default:
+      {
+        generateBase(10,20,10,20,0);
+        document.getElementById("title").innerHTML = 'Tower of Magi - Ground Floor';break;
+        Game.player.position.x = Math.random(1,Game.map.columns-2);
+        Game.player.position.y = Game.map.rows-2;
+      }
     }
 }
 
@@ -1297,8 +1303,12 @@ function generateBase(minx,maxx,miny,maxy,maxiteration)
   splitH(0,0,Game.map.columns-1,Game.map.rows-1,0,0,maxiteration);
 
   //player position
-  Game.player.position.x = Math.random(1,Game.map.columns-2);
-  Game.player.position.y = Game.map.rows-2;
+  do
+  {
+    Game.player.position.x = Math.random(1,Game.map.columns-2);
+    Game.player.position.y = Math.random(1,Game.map.rows-2);
+  }
+  while(!Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x].accessible)
 
   //stairs
   var x,y;
