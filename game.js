@@ -14,15 +14,18 @@ const XWALL = new Tile(false,0,32);
 const HDOOR = new Tile(true,96,64);
 const VDOOR = new Tile(true,64,64);
 const STAIRS = new Item(0,128,nextLevel);
-const FIRESHARD = new Item(0,160,increaseFire);
-const ICESHARD = new Item(32,160,increaseIce);
-const THUNDERSHARD = new Item(64,160,increaseThunder);
+const FIRESHARD = new Item(128,128,increaseFire);
+const ICESHARD = new Item(160,128,increaseIce);
+const THUNDERSHARD = new Item(192,128,increaseThunder);
 const HOTWOOD = new Tile(true,32,96); //unused
 const ASH = new Tile(true,64,96);
 const FIRE = new Tile(undefined,32,128);
 const ICE = new Tile(undefined,64,128);
 const HEART = new Item(96,128,increaseHealth);
 const TRAP = new Tile(true,128,96);
+const BTRAP = new Tile(true,160,96);
+const BHDOOR = new Tile(true,192,96);
+const BVDOOR = new Tile(true,192,32);
 
 generateMap(0);
 render();
@@ -1319,7 +1322,14 @@ function propagate(item,index)
             return undefined;
         else
         {
-            Game.map.tiles[index]=ASH;
+            if(Game.map.tiles[index]==WOOD)
+                Game.map.tiles[index]=ASH;
+            else if(Game.map.tiles[index]==HDOOR)
+                Game.map.tiles[index]=BHDOOR;
+            else if(Game.map.tiles[index]==VDOOR)
+                Game.map.tiles[index]=BVDOOR;
+            else if(Game.map.tiles[index]==TRAP)
+                Game.map.tiles[index]=BTRAP;
             return undefined;
         }
     }
@@ -1502,12 +1512,11 @@ function generateBase(minx,maxx,miny,maxy,maxiteration)
     });
 
     //player position
-    do
-    {
-        Game.player.position.x = Math.random(1,Game.map.columns-2);
-        Game.player.position.y = Math.random(1,Game.map.rows-2);
-    }
-    while(!Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x].accessible);
+    var room = Math.random(0,Game.map.rooms.length-1);
+    Game.player.position.x = Math.random(Game.map.rooms[room].sx+2,Game.map.rooms[room].ex-2);
+    Game.player.position.y = Math.random(Game.map.rooms[room].sy+2,Game.map.rooms[room].ey-2);
+    if(Game.level>0)
+        Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x]=TRAP;
 
     //stairs
     var x,y;
@@ -1542,10 +1551,10 @@ function generateBase(minx,maxx,miny,maxy,maxiteration)
 
 function splitV(sx,sy,ex,ey,entry,iteration,maxiteration)
 {
-    if(++iteration>maxiteration || (ex-sx)<7 || ((ex-sx)*(ey-sy)<20))
+    if(++iteration>maxiteration || (ex-sx)<8)
         return;
     Game.map.rooms.splice(entry,1);
-    var xsplit = Math.random(sx+3,ex-3);
+    var xsplit = Math.random(sx+4,ex-4);
     var offsplit = sx+xsplit;
 
     splitH(sx,sy,xsplit,ey,Game.map.rooms.push({sx:sx,ex:xsplit,sy:sy,ey:ey})-1,iteration,maxiteration);
@@ -1554,11 +1563,11 @@ function splitV(sx,sy,ex,ey,entry,iteration,maxiteration)
 
 function splitH(sx,sy,ex,ey,entry,iteration,maxiteration)
 {
-    if(++iteration>maxiteration || (ey-sy)<7 || ((ex-sx)*(ey-sy)<16))
+    if(++iteration>maxiteration || (ey-sy)<8)
         return;
 
     Game.map.rooms.splice(entry,1);
-    var ysplit = Math.random(sy+3,ey-3);
+    var ysplit = Math.random(sy+4,ey-4);
     var offsplit = sy+ysplit;
 
     splitV(sx,sy,ex,ysplit,Game.map.rooms.push({sx:sx,sy:sy,ex:ex,ey:ysplit})-1,iteration,maxiteration);
