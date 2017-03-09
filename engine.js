@@ -1,9 +1,22 @@
 "use strict";
+Math.seed = function(newseed)
+{
+    Math.seed = newseed;
+    return newseed;
+}
+
+Math.random = function(min,max)
+{
+    Math.seed=((7907*Math.seed)+7901)%(2147483647);
+    return Math.seed%(max-min+1)+min;
+}
+var seed = Math.seed(Math.floor(new Date().getTime()));
+//Math.seed(1489019637227);
 var Status = Object.freeze({MAP:0,MENU:1,AIM:2,SKILLMENU:3,WAIT:4,DEAD:9});
 var Game =
     {
         kstatus:Status.MAP,
-        player:new Actor(7,9,110,new Tile(false,0,0),0,0,0),
+        player:new Actor(0,0,Math.random(100,120),new Tile(false,0,0),0,0,0),
         npcs:[],
         tilesize:32,
         size:{width:800,height:600,offsetx:undefined,offsety:undefined},
@@ -29,17 +42,6 @@ Game.size.offsety = Math.floor(Game.size.height/Game.tilesize/2);
 var ctx = document.getElementById("cvs").getContext("2d");
 window.focus();
 window.onload = render;
-
-Math.seed = function(newseed)
-{
-    Math.seed = newseed;
-}
-
-Math.random = function(min,max)
-{
-    Math.seed=((7907*Math.seed)+7901)%(2147483647);
-    return Math.seed%(max-min+1)+min;
-}
 
 var debug = console.log;
 
@@ -175,7 +177,7 @@ function keybind(evt)
                         Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x-1].accessible == true)
                     {
                       //can't walk on ice
-                      if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x-1]!=undefined)
+                      if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x-1]!=undefined && !Game.skills[6])
                         if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x-1].type==1)
                           {
                             next_status = Status.MAP;
@@ -184,6 +186,27 @@ function keybind(evt)
 
                         Game.player.position.x--;
                         trigger_turn = true;
+                        if(Game.skills[7])
+                        {
+                            if(Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x]==WOOD)
+                                Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x]=ASH;
+                            if(Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x]==WOOD)
+                                Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x]=ASH;
+                            if(Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x]==WOOD)
+                                Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x]=ASH;
+                            if(Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x+1]==WOOD)
+                                Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x+1]=ASH;
+                            if(Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x-1]==WOOD)
+                                Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x-1]=ASH;
+                            if(Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x+1]==WOOD)
+                                Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x+1]=ASH;
+                            if(Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x-1]==WOOD)
+                                Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x-1]=ASH;
+                            if(Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x+1]==WOOD)
+                                Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x+1]=ASH;
+                            if(Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x-1]==WOOD)
+                                Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x-1]=ASH;
+                    }
                     }
                     next_status = Status.MAP;
                 }
@@ -274,7 +297,7 @@ function keybind(evt)
                         Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x].accessible == true)
                     {
                       //can't walk on ice
-                      if(Game.overlay[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x]!=undefined)
+                      if(Game.overlay[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x]!=undefined && !Game.skills[6])
                         if(Game.overlay[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x].type==1)
                         {
                           next_status = Status.MAP;
@@ -282,7 +305,28 @@ function keybind(evt)
                         }
 
                         Game.player.position.y--;
-                        trigger_turn = true;
+                    if(Game.skills[7])
+                        {
+                            if(Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x]==WOOD)
+                                Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x]=ASH;
+                            if(Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x]==WOOD)
+                                Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x]=ASH;
+                            if(Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x]==WOOD)
+                                Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x]=ASH;
+                            if(Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x+1]==WOOD)
+                                Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x+1]=ASH;
+                            if(Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x-1]==WOOD)
+                                Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x-1]=ASH;
+                            if(Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x+1]==WOOD)
+                                Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x+1]=ASH;
+                            if(Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x-1]==WOOD)
+                                Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x-1]=ASH;
+                            if(Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x+1]==WOOD)
+                                Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x+1]=ASH;
+                            if(Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x-1]==WOOD)
+                                Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x-1]=ASH;
+                    }
+    trigger_turn = true;
                     }
                     next_status = Status.MAP;
                 }
@@ -341,7 +385,7 @@ function keybind(evt)
                         Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x+1].accessible == true)
                     {
                       //can't walk on ice
-                      if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x+1]!=undefined)
+                      if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x+1]!=undefined && !Game.skills[6])
                         if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x+1].type==1)
                         {
                           next_status = Status.MAP;
@@ -350,6 +394,28 @@ function keybind(evt)
 
                         Game.player.position.x++;
                         trigger_turn = true;
+if(Game.skills[7])
+                        {
+                            if(Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x]==WOOD)
+                                Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x]=ASH;
+                            if(Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x]==WOOD)
+                                Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x]=ASH;
+                            if(Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x]==WOOD)
+                                Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x]=ASH;
+                            if(Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x+1]==WOOD)
+                                Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x+1]=ASH;
+                            if(Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x-1]==WOOD)
+                                Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x-1]=ASH;
+                            if(Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x+1]==WOOD)
+                                Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x+1]=ASH;
+                            if(Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x-1]==WOOD)
+                                Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x-1]=ASH;
+                            if(Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x+1]==WOOD)
+                                Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x+1]=ASH;
+                            if(Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x-1]==WOOD)
+                                Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x-1]=ASH;
+                    }
+
                     }
                     next_status = Status.MAP;
                 }
@@ -440,7 +506,7 @@ function keybind(evt)
                         Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x].accessible == true)
                     {
                       //can't walk on ice
-                      if(Game.overlay[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x]!=undefined)
+                      if(Game.overlay[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x]!=undefined && !Game.skills[6])
                         if(Game.overlay[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x].type==1)
                         {
                           next_status = Status.MAP;
@@ -449,6 +515,28 @@ function keybind(evt)
 
                         Game.player.position.y++;
                         trigger_turn = true;
+if(Game.skills[7])
+                        {
+                            if(Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x]==WOOD)
+                                Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x]=ASH;
+                            if(Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x]==WOOD)
+                                Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x]=ASH;
+                            if(Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x]==WOOD)
+                                Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x]=ASH;
+                            if(Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x+1]==WOOD)
+                                Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x+1]=ASH;
+                            if(Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x-1]==WOOD)
+                                Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x-1]=ASH;
+                            if(Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x+1]==WOOD)
+                                Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x+1]=ASH;
+                            if(Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x-1]==WOOD)
+                                Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x-1]=ASH;
+                            if(Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x+1]==WOOD)
+                                Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x+1]=ASH;
+                            if(Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x-1]==WOOD)
+                                Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x-1]=ASH;
+                    }
+
                     }
                     next_status = Status.MAP;
                 }
@@ -547,7 +635,7 @@ function keybind(evt)
                         break;
 
                     floorsel*=4
-                    var floorselmul = floorsel*=4;
+                    var floorselmul = floorsel;
                     if(Game.skills[floorselmul++] == 1 ||
                         Game.skills[floorselmul++] == 1 ||
                         Game.skills[floorselmul++] == 1 ||

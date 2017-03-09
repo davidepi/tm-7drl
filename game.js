@@ -1,4 +1,3 @@
-seed = Math.seed(Math.floor(new Date().getTime()));
 const WATER = new Tile(true,32,96);
 const WOOD = new Tile(true,0,96);
 const TLCORNER = new Tile(false,160,32);
@@ -36,7 +35,7 @@ function endTurn()
     Game.overlay=Game.Xoverlay;
     Game.Xoverlay=[];
     if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x]!=undefined)
-        if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x].type==0)
+        if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x].type==0 && !Game.skills[8])
         {
             Game.player.curhp-=10;
             console.log("Don't play with fire! You lose 10Hp");
@@ -140,20 +139,31 @@ function nextLevel()
     if(Game.enemies_left == 0)
     {
         generateMap(++Game.level);
+        var increase = Math.random(80,120);
+        console.log(Strings.completefloor[0]+increase+Strings.completefloor[1]);
+        var bonus_increase = 0;
+        if(Game.skills[0])
+        {
+            bonus_increase=(Math.floor(Game.player.maxhp/10));
+            console.log("Your skill Stoneskin grants you "+bonus_increase+" additional HP");
+            increase+=bonus_increase;
+        }
+        Game.player.maxhp+=increase;
+        Game.player.curhp+=increase;
     }
     else
-        switch(Game.level)
+    switch(Game.level)
     {
-            case 0:console.log("Please, collect the shard first :)");break;
+            case 0:console.log("Maybe it is better if you collect the shard and gain some magical power...");break;
             case 1:
             case 2:
-            case 3:console.log("You should defeat all your opponents to proceed!");break;
+            case 3:console.log(Strings.endfloor);break;
             case 4:
             case 5:
-            case 6:console.log("You have to kill every enemy mage before continuing");break;
+            case 6:console.log(Strings.endfloor);break;
             case 7:
             case 8:
-            case 9:console.log("You must slaughter every organic creature on sight before searching for others");break;
+            case 9:console.log(Strings.endfloor);break;
     }
 }
 
@@ -164,7 +174,7 @@ function increaseFire()
     //contain any loop
     var oldvalue = Game.player.fp;
     var newvalue = undefined;
-    Game.player.maxhp = Game.player.maxhp-Math.round(Game.player.maxhp/10);
+    Game.player.maxhp = Game.player.maxhp-Math.round(Game.player.maxhp/10+Math.random(-10,10));
     if(Game.player.curhp > Game.player.maxhp)
         Game.player.curhp = Game.player.maxhp;
     if(oldvalue == 0 && Game.player.ip == 0 && Game.player.tp == 0)
@@ -178,10 +188,11 @@ function increaseFire()
     {
         Game.player.ip = Game.player.ip>2?Game.player.ip-2:0;
         Game.player.tp = Game.player.tp>2?Game.player.tp-2:0;
-        Game.player.fp +=5;
-        if(Game.player.fp > 300)
+        Game.player.fp +=(7+Math.random(0,5));
+        if(Game.player.fp > 300 && !Game.skills[1])
             Game.player.fp = 300;
         newvalue = Game.player.fp;
+        console.log(Strings.shard);
     }
 
     //if first level newvalue is undefined so it will fail every evaluation
@@ -211,7 +222,7 @@ function increaseIce()
 {
     var oldvalue = Game.player.ip;
     var newvalue = undefined;
-    Game.player.maxhp = Game.player.maxhp-Math.round(Game.player.maxhp/10);
+    Game.player.maxhp = Game.player.maxhp-Math.round(Game.player.maxhp/10+Math.random(-10,10));
     if(Game.player.curhp > Game.player.maxhp)
         Game.player.curhp = Game.player.maxhp;
     if(oldvalue == 0 && Game.player.fp == 0 && Game.player.tp == 0)
@@ -225,11 +236,12 @@ function increaseIce()
     {
         Game.player.fp = Game.player.fp>2?Game.player.fp-2:0;
         Game.player.tp = Game.player.tp>2?Game.player.tp-2:0;
-        Game.player.ip +=5;
-        if(Game.player.ip > 300)
+        Game.player.ip +=(7+Math.random(0,5));
+        if(Game.player.ip > 300 && !Game.skills[1])
             Game.player.ip = 300;
         newvalue = Game.player.ip;
     }
+    console.log(Strings.shard);
 
     //if first level newvalue is undefined so it will fail every evaluation
     if(oldvalue == 0 && newvalue > 0) //add first tier
@@ -258,7 +270,8 @@ function increaseThunder()
 {
     var oldvalue = Game.player.tp;
     var newvalue = undefined;
-    Game.player.maxhp = Game.player.maxhp-Math.round(Game.player.maxhp/10);
+    var hpdecr = Math.round(Game.player.maxhp/10+Math.random(-10,10));
+    Game.player.maxhp = Game.player.maxhp-hpdecr;
     if(Game.player.curhp > Game.player.maxhp)
         Game.player.curhp = Game.player.maxhp;
     if(oldvalue == 0 && Game.player.ip == 0 && Game.player.fp == 0)
@@ -272,12 +285,12 @@ function increaseThunder()
     {
         Game.player.ip = Game.player.ip>2?Game.player.ip-2:0;
         Game.player.fp = Game.player.fp>2?Game.player.fp-2:0;
-        Game.player.tp +=5;
-        if(Game.player.tp>300)
+        Game.player.tp +=7+Math.random(0,5);
+        if(Game.player.tp>300 && !Game.skills[1])
             Game.player.tp = 300;
         newvalue = Game.player.tp;
     }
-
+    console.log(Strings.shard);
     //if first level newvalue is undefined so it will fail every evaluation
     if(oldvalue == 0 && newvalue > 0) //add first tier
     {
