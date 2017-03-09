@@ -12,10 +12,10 @@ Math.random = function(min,max)
 }
 var seed = Math.seed(Math.floor(new Date().getTime()));
 //Math.seed(1489019637227);
-var Status = Object.freeze({MAP:0,MENU:1,AIM:2,SKILLMENU:3,WAIT:4,DEAD:9});
+var Status = Object.freeze({MAP:0,MENU:1,AIM:2,SKILLMENU:3,WAIT:4,INTRO:8,DEAD:9});
 var Game =
     {
-        kstatus:Status.MAP,
+        kstatus:Status.INTRO,
         player:new Actor(0,0,Math.random(100,120),new Tile(false,0,0),0,0,0),
         npcs:[],
         tilesize:32,
@@ -66,10 +66,10 @@ function Item(startx,starty,action)
 
 function Effect(tile,intensity,type) //type: 0 = fire, 1= ice
 {
-  this.x = tile.x;
-  this.y = tile.y;
-  this.value = intensity;
-  this.type=type;
+    this.x = tile.x;
+    this.y = tile.y;
+    this.value = intensity;
+    this.type=type;
 }
 
 function Actor(posx,posy,maxhp,sprite,fire,ice,thunder)
@@ -141,14 +141,14 @@ function render()
             }
 
             if(Game.overlay[my*Game.map.columns+mx]!=undefined)
-              ctx.drawImage(Game.spritesheet,Game.overlay[my*Game.map.columns+mx].x,Game.overlay[my*Game.map.columns+mx].y,Game.tilesize,Game.tilesize,mx*Game.tilesize+startx,my*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                ctx.drawImage(Game.spritesheet,Game.overlay[my*Game.map.columns+mx].x,Game.overlay[my*Game.map.columns+mx].y,Game.tilesize,Game.tilesize,mx*Game.tilesize+startx,my*Game.tilesize+starty,Game.tilesize,Game.tilesize);
         }
 
     //drawplayer
     ctx.drawImage(Game.spritesheet,Game.player.model.x,Game.player.model.y,Game.tilesize,Game.tilesize,Game.player.position.x*Game.tilesize+startx,Game.player.position.y*Game.tilesize+starty,Game.tilesize,Game.tilesize);
 
     if(Game.kstatus==Status.AIM) //draw aim
-      aim(Game.selected,startx,starty);
+        aim(Game.selected,startx,starty);
 
     //draw NPCs
     for(var i=0;i<Game.npcs.length;i++)
@@ -176,13 +176,13 @@ function keybind(evt)
                     if(Game.player.position.x > 0 &&
                         Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x-1].accessible == true)
                     {
-                      //can't walk on ice
-                      if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x-1]!=undefined && !Game.skills[6])
-                        if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x-1].type==1)
-                          {
-                            next_status = Status.MAP;
-                            break;
-                          }
+                        //can't walk on ice
+                        if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x-1]!=undefined && !Game.skills[6])
+                            if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x-1].type==1)
+                            {
+                                next_status = Status.MAP;
+                                break;
+                            }
 
                         Game.player.position.x--;
                         trigger_turn = true;
@@ -206,7 +206,7 @@ function keybind(evt)
                                 Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x+1]=ASH;
                             if(Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x-1]==WOOD)
                                 Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x-1]=ASH;
-                    }
+                        }
                     }
                     next_status = Status.MAP;
                 }
@@ -224,7 +224,7 @@ function keybind(evt)
                         case "g2":next = "f2";unlocked = Game.abilities[3];break;
                         case "g3":next = "f3";unlocked = Game.abilities[6];break;
                         case "t1":
- {
+                            {
                                 unlocked = Game.abilities[1];
                                 if(unlocked)
                                     next="g1";
@@ -237,7 +237,7 @@ function keybind(evt)
                             }
 
                         case "t2":
- {
+                            {
                                 unlocked = Game.abilities[4];
                                 if(unlocked)
                                     next="g2";
@@ -249,7 +249,7 @@ function keybind(evt)
                                 break;
                             }
                         case "t3":
-                                 {
+                            {
                                 unlocked = Game.abilities[7];
                                 if(unlocked)
                                     next="g3";
@@ -271,9 +271,9 @@ function keybind(evt)
                 }
                 else if(current_status == Status.AIM)
                 {
-                  next_status = Status.AIM;
-                  force_redraw = true;
-                  Game.target = 0;
+                    next_status = Status.AIM;
+                    force_redraw = true;
+                    Game.target = 0;
                 }
                 else if(current_status == Status.SKILLMENU)
                 {
@@ -286,6 +286,10 @@ function keybind(evt)
                     document.getElementById(Game.skillselected).className+=" selected";
                     document.getElementById("skilldescription").innerHTML = Strings.skilldesc[currentselec];
                 }
+                else
+                {
+                    next_status = current_status;
+                }
                 break;
             }
         case 38: //Key up
@@ -296,16 +300,16 @@ function keybind(evt)
                     if(Game.player.position.y > 0 &&
                         Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x].accessible == true)
                     {
-                      //can't walk on ice
-                      if(Game.overlay[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x]!=undefined && !Game.skills[6])
-                        if(Game.overlay[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x].type==1)
-                        {
-                          next_status = Status.MAP;
-                          break;
-                        }
+                        //can't walk on ice
+                        if(Game.overlay[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x]!=undefined && !Game.skills[6])
+                            if(Game.overlay[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x].type==1)
+                            {
+                                next_status = Status.MAP;
+                                break;
+                            }
 
                         Game.player.position.y--;
-                    if(Game.skills[7])
+                        if(Game.skills[7])
                         {
                             if(Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x]==WOOD)
                                 Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x]=ASH;
@@ -325,8 +329,8 @@ function keybind(evt)
                                 Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x+1]=ASH;
                             if(Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x-1]==WOOD)
                                 Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x-1]=ASH;
-                    }
-    trigger_turn = true;
+                        }
+                        trigger_turn = true;
                     }
                     next_status = Status.MAP;
                 }
@@ -357,9 +361,9 @@ function keybind(evt)
                 }
                 else if(current_status == Status.AIM)
                 {
-                  next_status = Status.AIM;
-                  force_redraw = true;
-                  Game.target = 1;
+                    next_status = Status.AIM;
+                    force_redraw = true;
+                    Game.target = 1;
                 }
                 else if(current_status == Status.SKILLMENU)
                 {
@@ -373,6 +377,10 @@ function keybind(evt)
                     document.getElementById(Game.skillselected).className+=" selected";
                     document.getElementById("skilldescription").innerHTML = Strings.skilldesc[currentselec];
                 }
+                else
+                {
+                    next_status = current_status;
+                }
                 break;
 
             }
@@ -384,17 +392,17 @@ function keybind(evt)
                     if(Game.player.position.x > 0 &&
                         Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x+1].accessible == true)
                     {
-                      //can't walk on ice
-                      if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x+1]!=undefined && !Game.skills[6])
-                        if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x+1].type==1)
-                        {
-                          next_status = Status.MAP;
-                          break;
-                        }
+                        //can't walk on ice
+                        if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x+1]!=undefined && !Game.skills[6])
+                            if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x+1].type==1)
+                            {
+                                next_status = Status.MAP;
+                                break;
+                            }
 
                         Game.player.position.x++;
                         trigger_turn = true;
-if(Game.skills[7])
+                        if(Game.skills[7])
                         {
                             if(Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x]==WOOD)
                                 Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x]=ASH;
@@ -414,7 +422,7 @@ if(Game.skills[7])
                                 Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x+1]=ASH;
                             if(Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x-1]==WOOD)
                                 Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x-1]=ASH;
-                    }
+                        }
 
                     }
                     next_status = Status.MAP;
@@ -452,7 +460,7 @@ if(Game.skills[7])
                                 break;
                             }
                         case "f3":
-                             {
+                            {
                                 unlocked = Game.abilities[7];
                                 if(unlocked)
                                     next="g3";
@@ -479,9 +487,9 @@ if(Game.skills[7])
                 }
                 else if(current_status == Status.AIM)
                 {
-                  next_status = Status.AIM;
-                  force_redraw = true;
-                  Game.target = 2;
+                    next_status = Status.AIM;
+                    force_redraw = true;
+                    Game.target = 2;
                 }
                 else if(current_status == Status.SKILLMENU)
                 {
@@ -494,6 +502,10 @@ if(Game.skills[7])
                     document.getElementById(Game.skillselected).className+=" selected";
                     document.getElementById("skilldescription").innerHTML = Strings.skilldesc[currentselec];
                 }
+                else
+                {
+                    next_status = current_status;
+                }
                 break;
 
             }
@@ -505,17 +517,17 @@ if(Game.skills[7])
                     if(Game.player.position.y > 0 &&
                         Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x].accessible == true)
                     {
-                      //can't walk on ice
-                      if(Game.overlay[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x]!=undefined && !Game.skills[6])
-                        if(Game.overlay[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x].type==1)
-                        {
-                          next_status = Status.MAP;
-                          break;
-                        }
+                        //can't walk on ice
+                        if(Game.overlay[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x]!=undefined && !Game.skills[6])
+                            if(Game.overlay[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x].type==1)
+                            {
+                                next_status = Status.MAP;
+                                break;
+                            }
 
                         Game.player.position.y++;
                         trigger_turn = true;
-if(Game.skills[7])
+                        if(Game.skills[7])
                         {
                             if(Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x]==WOOD)
                                 Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x]=ASH;
@@ -535,7 +547,7 @@ if(Game.skills[7])
                                 Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x+1]=ASH;
                             if(Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x-1]==WOOD)
                                 Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x-1]=ASH;
-                    }
+                        }
 
                     }
                     next_status = Status.MAP;
@@ -567,9 +579,9 @@ if(Game.skills[7])
                 }
                 else if(current_status == Status.AIM)
                 {
-                  next_status = Status.AIM;
-                  force_redraw = true;
-                  Game.target = 3;
+                    next_status = Status.AIM;
+                    force_redraw = true;
+                    Game.target = 3;
                 }
                 else if(current_status == Status.SKILLMENU)
                 {
@@ -582,6 +594,10 @@ if(Game.skills[7])
                     Game.skillselected = "s"+currentselec;
                     document.getElementById(Game.skillselected).className+=" selected";
                     document.getElementById("skilldescription").innerHTML = Strings.skilldesc[currentselec];
+                }
+                else
+                {
+                    next_status = current_status;
                 }
                 break;
 
@@ -612,15 +628,15 @@ if(Game.skills[7])
                 }
                 else if (current_status == Status.MENU)
                 {
-                  force_redraw = true;
-                  next_status = Status.AIM;
+                    force_redraw = true;
+                    next_status = Status.AIM;
                 }
                 else if (current_status == Status.AIM)
                 {
-                  cast(Game.selected);
-                  trigger_turn = true;
-                  document.getElementById(Game.selected).className = "";
-                  next_status = Status.MAP;
+                    cast(Game.selected);
+                    trigger_turn = true;
+                    document.getElementById(Game.selected).className = "";
+                    next_status = Status.MAP;
                 }
                 else if(current_status == Status.SKILLMENU)
                 {
@@ -628,10 +644,10 @@ if(Game.skills[7])
                     var sselected = parseInt(Game.skillselected.substring(1));
                     var floorsel = Math.floor(sselected/4);
                     if(floorsel==0 && Game.level<1 ||
-                       floorsel==1 && Game.level<3 ||
-                       floorsel==2 && Game.level<5 ||
-                       floorsel==3 && Game.level<7 ||
-                       floorsel==4 && Game.level<9) //level unmet
+                        floorsel==1 && Game.level<3 ||
+                        floorsel==2 && Game.level<5 ||
+                        floorsel==3 && Game.level<7 ||
+                        floorsel==4 && Game.level<9) //level unmet
                         break;
 
                     floorsel*=4
@@ -641,13 +657,17 @@ if(Game.skills[7])
                         Game.skills[floorselmul++] == 1 ||
                         Game.skills[floorselmul++] == 1) //already one skill selected
                         break;
-                        
+
                     Game.skills[sselected] = 1;
                     document.getElementById("s"+floorsel++).className="locked";
                     document.getElementById("s"+floorsel++).className="locked";
                     document.getElementById("s"+floorsel++).className="locked";
                     document.getElementById("s"+floorsel++).className="locked";
                     document.getElementById(Game.skillselected).className="unlocked";
+                }
+                else
+                {
+                    next_status = current_status;
                 }
                 break;
             }
@@ -678,54 +698,96 @@ if(Game.skills[7])
             }
         case 107: //k,K
         case 75:
-        {
-          if(current_status==Status.SKILLMENU)
-          {
-              next_status = Status.MAP;
-              document.getElementById("skillmenu").style.display="none";
-              document.getElementById("skillbg").style.display="none";
-              document.getElementById(Game.skillselected).classList.remove("selected");
-              Game.skillselected=undefined;
-          }
-          else
-          {
-            next_status = Status.SKILLMENU;
-            document.getElementById("skillmenu").style.display="block";
-            document.getElementById("skillbg").style.display="block";
-            if(Game.selected!=undefined)
             {
-              document.getElementById(Game.selected).className = '';
-              Game.selected = undefined;
+                if(current_status==Status.SKILLMENU)
+                {
+                    next_status = Status.MAP;
+                    document.getElementById("skillmenu").style.display="none";
+                    document.getElementById("skillbg").style.display="none";
+                    document.getElementById(Game.skillselected).classList.remove("selected");
+                    Game.skillselected=undefined;
+                }
+                else if(current_status != Status.INTRO)
+                {
+                    next_status = Status.SKILLMENU;
+                    document.getElementById("skillmenu").style.display="block";
+                    document.getElementById("skillbg").style.display="block";
+                    if(Game.selected!=undefined)
+                    {
+                        document.getElementById(Game.selected).className = '';
+                        Game.selected = undefined;
+                    }
+                    Game.skillselected="s0";
+                    document.getElementById(Game.skillselected).className += ' selected';
+                    document.getElementById("skilldescription").innerHTML = Strings.skilldesc[0];
+                    force_redraw = true; //to clear green tiles if one was aiming
+                }
+                else
+                {
+                    next_status = current_status;
+                }
+                break;
             }
-            Game.skillselected="s0";
-            document.getElementById(Game.skillselected).className += ' selected';
-            document.getElementById("skilldescription").innerHTML = Strings.skilldesc[0];
-            force_redraw = true; //to clear green tiles if one was aiming
-          }
-          break;
-        }
         case 108: //l,L
-        case 76: console.log("key L");break;
+        case 76: 
+            {
+                next_status = current_status;
+                break;
+            }
         case 97: //a,A
-        case 65: console.log("key a");break;
+        case 65:
+            {
+                next_status = current_status;
+                break;
+            }
         case 119: //w,W
-        case 87: console.log("key w");break;
+        case 87:
+            {
+                next_status = current_status;
+                break;
+            }
         case 100: //d,D
-        case 68: console.log("key d");break;
+        case 68:
+            {
+                next_status = current_status;
+                break;
+            }
         case 115: //s,S
-        case 83: console.log("key s");break;
+        case 83: 
+            {
+                next_status = current_status;
+                break;
+            }
         case 116: //t,T
         case 84:
-        {
-          if(current_status==Status.MAP)
-            trigger_turn = true;
-            next_status = current_status;break;
-        }
+            {
+                if(current_status==Status.MAP)
+                    trigger_turn = true;
+                next_status = current_status;
+                break;
+            }
+        case 112:
+        case 80:
+            {
+                if(current_status == Status.INTRO)
+                {
+                    document.getElementById("intro").style.display="none";
+                    document.getElementById("introbg").style.display="none";
+                    next_status = Status.MAP;
+                }
+                else
+                {
+                    document.getElementById("intro").style.display="block";
+                    document.getElementById("introbg").style.display="block";
+                    next_status = Status.INTRO;
+                }
+                break;
+            }
         default:
-        {
-            next_status = current_status;
-            break;
-        }
+            {
+                next_status = current_status;
+                break;
+            }
     }
 
     if(trigger_turn)
@@ -736,10 +798,10 @@ if(Game.skills[7])
             current_cell_object.trigger();
         var res = endTurn();
         if(!res)
-        next_status = Status.DEAD;
+            next_status = Status.DEAD;
         render();
     }
     Game.kstatus = next_status;
     if(force_redraw)
-      render(); //force rerender of the tiles even if the turn didn't elapsed
+        render(); //force rerender of the tiles even if the turn didn't elapsed
 }

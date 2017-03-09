@@ -88,77 +88,98 @@ h1
 }
 .selected
 {
-  color: yellow !important;
+    color: yellow !important;
 }
 
-#skillbg
+#skillbg, #introbg
 {
-  display: none;
-  position:fixed;
-  top:0;
-  left:0;
-  height:100%;
-  width:100%;
-  z-index:10;
-  background-color:rgba(30,30,30,.8);
-  -webkit-backdrop-filter: blur(6px);
+    display: none;
+    position:fixed;
+    top:0;
+    left:0;
+    height:100%;
+    width:100%;
+    z-index:10;
+    background-color:rgba(30,30,30,.8);
+    -webkit-backdrop-filter: blur(6px);
 }
-#skillmenu
+#introbg
 {
-  display: none;
-  z-index:1000;
-  position:fixed;
-  height:75%;
-  width:50%;
-  top:50%;
-  left:50%;
-  -webkit-transform: translate(-50%, -50%);
+    display:block;
+    background-color:rgb(30,30,30,.95);
+    -webkit-backdrop-filter: blur(10px);
+}
+#skillmenu, #intro
+{
+    display: none;
+    z-index:1000;
+    position:fixed;
+    height:75%;
+    width:50%;
+    top:50%;
+    left:50%;
+    -webkit-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
+}
+#intro
+{
+    display:block;
+    height:auto;
+}
+#intro > div
+{
+    padding:30px;
+    padding-top:0px;
+    overflow:scroll;
+}
+#intro p
+{
+    text-align:justify;
 }
 #skillmenu > div:first-child
 {
-  width:100%;
-  top:0px;
-  border-bottom:2px solid white;
-  margin-bottom:20px;
+    width:100%;
+    top:0px;
+    border-bottom:2px solid white;
+    margin-bottom:20px;
 }
 #skilldescription
 {
-  position:absolute;
-  padding:20px;
-  bottom:0px;
-  border-top:2px solid white;
-  width:100%;
-  -webkit-box-sizing: border-box;
+    position:absolute;
+    padding:20px;
+    bottom:0px;
+    border-top:2px solid white;
+    width:100%;
+    -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box; 
     box-sizing: border-box;
 }
-h3
+h3,h2
 {
-  font-weight: bold;
-  width:100%;
-  vertical-align: middle;
-  text-align: center;
+    font-weight: bold;
+    width:100%;
+    vertical-align: middle;
+    text-align: center;
 }
 table
 {
-  margin:20px;
+    margin:20px;
 }
 td
 {
-  padding:5px;
-  text-align:center;
-  margin:10px;
+    padding:5px;
+    text-align:center;
+    margin:10px;
 }
 .unlocked
 {
-  color:lime;
+    color:lime;
 }
 .locked
 {
-  color:crimson;
+    color:crimson;
 }
 .disabled
 {
-  color:darkgrey;
+    color:darkgrey;
 }

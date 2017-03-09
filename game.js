@@ -152,7 +152,7 @@ function nextLevel()
         Game.player.curhp+=increase;
     }
     else
-    switch(Game.level)
+        switch(Game.level)
     {
             case 0:console.log("Maybe it is better if you collect the shard and gain some magical power...");break;
             case 1:
@@ -1396,8 +1396,8 @@ function generateBase(minx,maxx,miny,maxy,maxiteration)
     }
     while(!Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x].accessible);
 
-        //stairs
-        var x,y;
+    //stairs
+    var x,y;
     do
     {
         x = Math.random(1,Game.map.columns-2);
@@ -1407,7 +1407,7 @@ function generateBase(minx,maxx,miny,maxy,maxiteration)
         !Game.map.tiles[y*Game.map.columns+x].accessible ||
         Game.objects[y*Game.map.columns+x]!=undefined);
 
-        Game.objects[y*Game.map.columns+x] = STAIRS;
+    Game.objects[y*Game.map.columns+x] = STAIRS;
     do
     {
         x = Math.random(1,Game.map.columns-2);
@@ -1416,7 +1416,7 @@ function generateBase(minx,maxx,miny,maxy,maxiteration)
     while((x==Game.player.position.x && y==Game.player.position.y) ||
         !Game.map.tiles[y*Game.map.columns+x].accessible ||
         Game.objects[y*Game.map.columns+x]!=undefined);
-    
+
     var a = Math.random(0,2);
     switch(a)
     {
