@@ -1512,6 +1512,103 @@ function generateBase(minx,maxx,miny,maxy,maxiteration)
                 else
                     Game.map.tiles[ind] = BRCORNER;
         }
+        //first bit -> door left
+        //second bit -> door top
+        //third bit -> door right
+        //last bit -> door bottom
+        var nrooms = Math.random(0,15)
+        var already_door = false;
+        var generated_doors = 0;
+        var door_position;
+        while(!generated_doors && Game.map.rooms.length>1) //at least one door per room
+        {
+            nrooms = Math.random(0,15);
+            
+            if(nrooms & 0x1 && element.sx!=0)
+            {
+                already_door = false;
+                for(var i=element.sy;i<element.ey;i++)
+                    if(Game.map.tiles[i*Game.map.columns+element.sx]==VDOOR)
+                    {
+                        already_door = true;
+                        generated_doors++;
+                        break;
+                    }
+                if(!already_door)
+                {
+                    door_position = Math.random(element.sy+1,element.ey-1);
+                    if(Game.map.tiles[door_position*Game.map.columns+element.sx] == VWALL)
+                    {
+                        Game.map.tiles[door_position*Game.map.columns+element.sx]=VDOOR;
+                        generated_doors++;
+                    }
+                }
+            }
+            if(nrooms & 0x2 && element.sy !=0 )
+            {
+                already_door = false;
+                ind = element.sy*Game.map.columns;
+                for(var i=element.sx;i<=element.ex;i++)
+                    if(Game.map.tiles[ind+i]==HDOOR)
+                    {
+                        already_door = true;
+                        generated_doors++;
+                        break;
+                    }
+                if(!already_door)
+                {
+                    door_position = Math.random(element.sx+1,element.ex-1);
+                    if(Game.map.tiles[ind+door_position]==HWALL)
+                    {
+                        Game.map.tiles[ind+door_position]=HDOOR;
+                        generated_doors++;
+                    }
+                }
+            }
+            if(nrooms & 0x4 && element.ex!=Game.map.columns-1)
+            {
+                already_door = false;
+                for(var i=element.sy;i<element.ey;i++)
+                    if(Game.map.tiles[i*Game.map.columns+element.ex]==VDOOR)
+                    {
+                        already_door = true;
+                        generated_doors++;
+                        break;
+                    }
+                if(!already_door)
+                {
+                    door_position = Math.random(element.sy+1,element.ey-1);
+                    if(Game.map.tiles[door_position*Game.map.columns+element.ex] == VWALL)
+                    {
+                        Game.map.tiles[door_position*Game.map.columns+element.ex]=VDOOR;
+                        generated_doors++;
+                    }
+                }
+
+            }
+            if(nrooms & 0x8 && element.ey!=Game.map.rows-1)
+            {
+                already_door = false;
+                ind = element.ey*Game.map.columns;
+                for(var i=element.sx;i<=element.ex;i++)
+                    if(Game.map.tiles[ind+i]==HDOOR)
+                    {
+                        already_door = true;
+                        generated_doors++;
+                        break;
+                    }
+                if(!already_door)
+                {
+                    door_position = Math.random(element.sx+1,element.ex-1);
+                    if(Game.map.tiles[ind+door_position]==HWALL)
+                    {
+                        Game.map.tiles[ind+door_position]=HDOOR;
+                        generated_doors++;
+                    }
+                }
+
+            }
+        }
     });
 
     //player position
