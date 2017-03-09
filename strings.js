@@ -43,6 +43,8 @@ function stringSwap1()
             endfloor:"You have to kill every enemy mage before continuing",
             shard:"Conscious of the fact that every magic crystal consumes part of your life you collect one, because you need to be powerful in order to escape the tower",
             completefloor:["You completed a floor and magic is growing in you. Usually this would shrink your life, but instead you gained "," HP by feeding with enemy life"],
+            lumina: "You invoke the power of Lumina. Your hands starts glowing, and suddendly a green light accompained by a loud noise overwhelm everything. As soon as you are able to see, everything is covered in ash. Your enemies are almost dead, unable to move. You decide to not use such a tremendous power anymore",
+            nolumina: "You can still recall the destruction caused by Lumina and refuse to use it again",
         }
 }
 
@@ -60,5 +62,7 @@ function stringSwap2()
             endfloor:"You absolutely want to slaughter every organic creature on sight before searching for others",
             shard:"You seek unlimited power, and don't care about the magic consuming you. You absorb every single droplet of magic in the stone",
             completefloor:["You left a trail of death and desperation beyond you. Your bloodthirst can not be stopped and every enemy you kill increase your life. You gained "," HP from this floor"],
+            lumina: "You invoke the power of Lumina. Your hands starts glowing, and suddendly a green light overwhelm everything. You can barely listen the screams of your enemies, burning alive in such a great power. As soon as you are able to see, everything is destroyed, burned, covered in ash. Your enemies can not move. You surely want to use this power again, but you are unable to do anything",
+            nolumina: "You can still hear the screams of your enemies dying under the immense power of Lumina... but she refuses to unleash her fury again",
         }
 }

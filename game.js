@@ -1,5 +1,5 @@
 const WATER = new Tile(true,32,96);
-const WOOD = new Tile(true,0,96);
+const WOOD = new Tile(true,32,96);
 const TLCORNER = new Tile(false,160,32);
 const BLCORNER = new Tile(false,160,64);
 const TRCORNER = new Tile(false,128,64);
@@ -17,7 +17,6 @@ const STAIRS = new Item(0,128,nextLevel);
 const FIRESHARD = new Item(128,128,increaseFire);
 const ICESHARD = new Item(160,128,increaseIce);
 const THUNDERSHARD = new Item(192,128,increaseThunder);
-const HOTWOOD = new Tile(true,32,96); //unused
 const ASH = new Tile(true,64,96);
 const FIRE = new Tile(undefined,32,128);
 const ICE = new Tile(undefined,64,128);
@@ -26,6 +25,7 @@ const TRAP = new Tile(true,128,96);
 const BTRAP = new Tile(true,160,96);
 const BHDOOR = new Tile(true,192,96);
 const BVDOOR = new Tile(true,192,32);
+const BSTAIRS = new Item(0,96,nextLevel);
 
 generateMap(0);
 render();
@@ -1233,7 +1233,7 @@ function cast(type)
         }
 
         //destroy objects on hit
-        if(Game.objects[current_pos]!=undefined && Game.objects[current_pos]!=STAIRS)
+        if(Game.objects[current_pos]!=undefined && Game.objects[current_pos]!=STAIRS && Game.objects[current_pos]!=BSTAIRS)
             Game.objects[current_pos]=undefined;
 
         //TODO check if enemies and add damage
@@ -1324,12 +1324,15 @@ function propagate(item,index)
         {
             if(Game.map.tiles[index]==WOOD)
                 Game.map.tiles[index]=ASH;
+            else if(Game.map.tiles[index]==ASH); //ASH is a lot more common than the others. In this way I avoid to process every else-if
             else if(Game.map.tiles[index]==HDOOR)
                 Game.map.tiles[index]=BHDOOR;
             else if(Game.map.tiles[index]==VDOOR)
                 Game.map.tiles[index]=BVDOOR;
             else if(Game.map.tiles[index]==TRAP)
                 Game.map.tiles[index]=BTRAP;
+            if(Game.objects[index]==STAIRS)
+                Game.objects[index]=BSTAIRS;
             return undefined;
         }
     }
@@ -1358,7 +1361,7 @@ function propagate(item,index)
                             Game.Xoverlay[new_index] = new Effect(FIRE,10,0);
                         else
                             Game.Xoverlay[new_index] = new Effect(FIRE,3,0);
-                        if(Game.objects[new_index]!=undefined && Game.objects[new_index]!=STAIRS)
+                        if(Game.objects[new_index]!=undefined && Game.objects[new_index]!=STAIRS && Game.objects[new_index]!=BSTAIRS)
                             Game.objects[new_index]=undefined;
                     }
                 }

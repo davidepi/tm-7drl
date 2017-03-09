@@ -730,6 +730,29 @@ function keybind(evt)
         case 108: //l,L
         case 76: 
             {
+                if(Game.skills[13]==1 && current_status==Status.MAP)
+                {
+                    console.log(Strings.lumina);
+                    //TODO: process enemies
+                    trigger_turn = true;
+                    Game.skills[13]=2;
+                    for(var i=0;i<Game.map.tiles.length;i++)
+                    {
+                        if(Game.map.tiles[i]==WOOD)
+                            Game.map.tiles[i]=ASH;
+                        else if(Game.map.tiles[i]==TRAP)
+                            Game.map.tiles[i]=BTRAP;
+                        else if(Game.map.tiles[i]==HDOOR)
+                            Game.map.tiles[i]=BHDOOR;
+                        else if(Game.map.tiles[i]==VDOOR)
+                            Game.map.tiles[i]=BVDOOR;
+
+                        if(Game.objects[i]==STAIRS)
+                            Game.objects[i]=BSTAIRS;
+                    }
+                }
+                else if(Game.skills[13]==2 && current_status==Status.MAP)
+                    console.log(Strings.nolumina);
                 next_status = current_status;
                 break;
             }
