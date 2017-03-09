@@ -10,8 +10,8 @@ Math.random = function(min,max)
     Math.seed=((7907*Math.seed)+7901)%(2147483647);
     return Math.seed%(max-min+1)+min;
 }
-var seed = Math.seed(Math.floor(new Date().getTime()));
-//Math.seed(1489019637227);
+//var seed = Math.seed(Math.floor(new Date().getTime()));
+Math.seed(1489019637227);
 var Status = Object.freeze({MAP:0,MENU:1,AIM:2,SKILLMENU:3,WAIT:4,INTRO:8,DEAD:9});
 var Game =
     {

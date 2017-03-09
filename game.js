@@ -1363,119 +1363,6 @@ function propagate(item,index)
     return undefined;
 }
 
-function generateBase(minx,maxx,miny,maxy,maxiteration)
-{
-    Game.map.rows = Math.random(minx,maxx);
-    Game.map.columns = Math.random(miny,maxy);
-    for(var y=0;y<Game.map.rows;y++)
-        for(var x=0;x<Game.map.columns;x++)
-        {
-            Game.map.hidden[y*Game.map.columns+x] = 0;
-            if(x==0 || x==Game.map.columns-1)
-                Game.map.tiles[y*Game.map.columns+x] = VWALL;
-            else if(y==0 || y==Game.map.rows-1)
-                Game.map.tiles[y*Game.map.columns+x] = HWALL;
-            else
-                Game.map.tiles[y*Game.map.columns+x] = WOOD;
-        }
-    Game.map.tiles[0] = TLCORNER;
-    Game.map.tiles[Game.map.columns-1]=TRCORNER;
-    Game.map.tiles[(Game.map.rows-1)*(Game.map.columns)] = BLCORNER;
-    Game.map.tiles[(Game.map.rows-1)*(Game.map.columns)+Game.map.columns-1] = BRCORNER;
-
-    Game.map.rooms = [{sx:0,sy:0,ex:Game.map.columns-1,ey:Game.map.rows-1}];
-    Math.random(0,1)==0?
-        splitV(0,0,Game.map.columns-1,Game.map.rows-1,0,0,maxiteration):
-        splitH(0,0,Game.map.columns-1,Game.map.rows-1,0,0,maxiteration);
-
-    //player position
-    do
-    {
-        Game.player.position.x = Math.random(1,Game.map.columns-2);
-        Game.player.position.y = Math.random(1,Game.map.rows-2);
-    }
-    while(!Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x].accessible);
-
-    //stairs
-    var x,y;
-    do
-    {
-        x = Math.random(1,Game.map.columns-2);
-        y = Math.random(1,Game.map.rows-2);
-    }
-    while((x==Game.player.position.x && y==Game.player.position.y) ||
-        !Game.map.tiles[y*Game.map.columns+x].accessible ||
-        Game.objects[y*Game.map.columns+x]!=undefined);
-
-    Game.objects[y*Game.map.columns+x] = STAIRS;
-    do
-    {
-        x = Math.random(1,Game.map.columns-2);
-        y = Math.random(1,Game.map.rows-2);
-    }
-    while((x==Game.player.position.x && y==Game.player.position.y) ||
-        !Game.map.tiles[y*Game.map.columns+x].accessible ||
-        Game.objects[y*Game.map.columns+x]!=undefined);
-
-    var a = Math.random(0,2);
-    switch(a)
-    {
-        case 0: Game.objects[y*Game.map.columns+x] = FIRESHARD;break;
-        case 1: Game.objects[y*Game.map.columns+x] = ICESHARD;break;
-        case 2: Game.objects[y*Game.map.columns+x] = THUNDERSHARD;break;
-    }
-    Game.kstatus = Status.MAP;
-}
-
-function splitV(sx,sy,ex,ey,entry,iteration,maxiteration)
-{
-    if(++iteration>maxiteration || (ex-sx)<7 || ((ex-sx)*(ey-sy)<16))
-        return;
-    Game.map.rooms.splice(entry,1);
-    var xsplit = Math.random(sx+3,ex-3);
-    var offsplit = sx+xsplit;
-    if(Game.map.tiles[(sy-1)*Game.map.columns+offsplit]!=TUP)
-        Game.map.tiles[sy*Game.map.columns+offsplit] = TDOWN;
-    else
-        Game.map.tiles[sy*Game.map.columns+offsplit] = XWALL; //if connecting to another T-shape generate a X-shape instead
-
-    if(Game.map.tiles[(ey+1)*Game.map.columns+offsplit]!=TDOWN)
-        Game.map.tiles[ey*Game.map.columns+offsplit] = TUP;
-    else
-        Game.map.tiles[ey*Game.map.columns+offsplit] = XWALL;
-    for(var my=sy+1;my<ey;my++)
-        Game.map.tiles[my*Game.map.columns+offsplit] = VWALL;
-
-    splitH(sx,sy,xsplit,ey,Game.map.rooms.push({sx:sx,ex:xsplit,sy:sy,ey:ey})-1,iteration,maxiteration);
-    splitH(xsplit,sy,ex,ey,Game.map.rooms.push({sx:xsplit,sy:sy,ex:ex,ey:ey})-1,iteration,maxiteration);
-}
-
-function splitH(sx,sy,ex,ey,entry,iteration,maxiteration)
-{
-    if(++iteration>maxiteration || (ey-sy)<7 || ((ex-sx)*(ey-sy)<16))
-        return;
-
-    Game.map.rooms.splice(entry,1);
-    var ysplit = Math.random(sy+3,ey-3);
-    var offsplit = sy+ysplit;
-
-    if(Game.map.tiles[offsplit*Game.map.columns+sx-1]!=TLEFT)
-        Game.map.tiles[offsplit*Game.map.columns+sx] = TRIGHT;
-    else
-        Game.map.tiles[offsplit*Game.map.columns+sx] = XWALL;
-
-    if(Game.map.tiles[offsplit*Game.map.columns+sx+1]!=TRIGHT)
-        Game.map.tiles[offsplit*Game.map.columns+ex] = TLEFT;
-    else
-        Game.map.tiles[offsplit*Game.map.columns+sx] = XWALL;
-
-    for(var mx=sx+1;mx<ex;mx++)
-        Game.map.tiles[offsplit*Game.map.columns+mx] = HWALL;
-
-    splitV(sx,sy,ex,ysplit,Game.map.rooms.push({sx:sx,sy:sy,ex:ex,ey:ysplit})-1,iteration,maxiteration);
-    splitV(sx,ysplit,ex,ey,Game.map.rooms.push({sx:sx,sy:ysplit,ex:ex,ey:ey})-1,iteration,maxiteration);
-}
-
 function enableSkills(magnitude)
 {
     switch(magnitude)
@@ -1521,4 +1408,159 @@ function enableSkills(magnitude)
                 break;
             }
     }
+}
+
+function generateBase(minx,maxx,miny,maxy,maxiteration)
+{
+    Game.map.rows = Math.random(minx,maxx);
+    Game.map.columns = Math.random(miny,maxy);
+    Game.map.rooms = [{sx:0,sy:0,ex:Game.map.columns-1,ey:Game.map.rows-1}];
+    Math.random(0,1)==0?
+        splitV(0,0,Game.map.columns-1,Game.map.rows-1,0,0,maxiteration):
+        splitH(0,0,Game.map.columns-1,Game.map.rows-1,0,0,maxiteration);
+
+    var ind,door;
+    Game.map.rooms.forEach(function(element,index) //fill the rooms
+        {
+        for(var y=element.sy;y<=element.ey;y++)
+            for(var x=element.sx;x<=element.ex;x++)
+            {
+                ind = y*Game.map.columns+x;
+                Game.map.hidden[ind] = 0;
+                if(x==element.sx || x==element.ex && Game.map.tiles[ind]==undefined)
+                    Game.map.tiles[ind] = VWALL;
+                else if(y==element.sy || y==element.ey && Game.map.tiles[ind]==undefined)
+                    Game.map.tiles[ind] = HWALL;
+                else if(Game.map.tiles[ind]==undefined)
+                    Game.map.tiles[ind] = WOOD;
+            }
+        });
+    Game.map.rooms.forEach(function(element,index) //apply doors and corners
+    {
+        //top left
+        ind = element.sy*Game.map.columns+element.sx;
+        if(Game.map.tiles[ind-1]!=WOOD && element.sx!=0)
+            if(Game.map.tiles[(element.sy-1)*Game.map.columns+element.sx]==VWALL)
+                Game.map.tiles[ind]=XWALL;
+            else
+                Game.map.tiles[ind]=TDOWN;
+
+        else
+                if(Game.map.tiles[(element.sy-1)*Game.map.columns+element.sx]==VWALL)
+                    Game.map.tiles[ind] = TRIGHT;
+                else
+                    Game.map.tiles[ind] = TLCORNER;
+        //top right
+        ind = element.sy*Game.map.columns+element.ex;
+        if(Game.map.tiles[ind]==VWALL || Game.map.tiles[ind]==HWALL) //otherwise already processed
+        {
+            if(Game.map.tiles[ind+1]!=WOOD && element.ex!=Game.map.columns-1)
+                if(Game.map.tiles[(element.sy-1)*Game.map.columns+element.ex]==VWALL)
+                    Game.map.tiles[ind]=XWALL;
+                else
+                    Game.map.tiles[ind]=TDOWN;
+
+            else
+                if(Game.map.tiles[(element.sy-1)*Game.map.columns+element.ex]==VWALL)
+                    Game.map.tiles[ind] = TLEFT;
+                else
+                    Game.map.tiles[ind] = TRCORNER;
+        }
+        //bottom left
+        ind = element.ey*Game.map.columns+element.sx
+        if(Game.map.tiles[ind]==VWALL || Game.map.tiles[ind]==HWALL)
+        {
+        if(Game.map.tiles[ind-1]!=WOOD && element.sx!=0)
+            if(Game.map.tiles[(element.ey+1)*Game.map.columns+element.sx]==VWALL)
+                Game.map.tiles[ind]=XWALL;
+            else
+                Game.map.tiles[ind]=TUP;
+
+        else
+                if(Game.map.tiles[(element.ey+1)*Game.map.columns+element.sx]==VWALL)
+                    Game.map.tiles[ind] = TRIGHT;
+                else
+                    Game.map.tiles[ind] = BLCORNER;
+        }
+
+        //bottom right
+         ind = element.ey*Game.map.columns+element.ex
+        if(Game.map.tiles[ind]==VWALL || Game.map.tiles[ind]==HWALL)
+        {
+        if(Game.map.tiles[ind+1]!=WOOD && element.ex!=Game.map.columns-1)
+            if(Game.map.tiles[(element.ey+1)*Game.map.columns+element.ex]==VWALL)
+                Game.map.tiles[ind]=XWALL;
+            else
+                Game.map.tiles[ind]=TUP;
+
+        else
+                if(Game.map.tiles[(element.ey+1)*Game.map.columns+element.ex]==VWALL)
+                    Game.map.tiles[ind] = TLEFT;
+                else
+                    Game.map.tiles[ind] = BRCORNER;
+        }
+    });
+
+    //player position
+    do
+    {
+        Game.player.position.x = Math.random(1,Game.map.columns-2);
+        Game.player.position.y = Math.random(1,Game.map.rows-2);
+    }
+    while(!Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x].accessible);
+
+    //stairs
+    var x,y;
+    do
+    {
+        x = Math.random(1,Game.map.columns-2);
+        y = Math.random(1,Game.map.rows-2);
+    }
+    while((x==Game.player.position.x && y==Game.player.position.y) ||
+        !Game.map.tiles[y*Game.map.columns+x].accessible ||
+        Game.objects[y*Game.map.columns+x]!=undefined);
+
+    Game.objects[y*Game.map.columns+x] = STAIRS;
+    do
+    {
+        x = Math.random(1,Game.map.columns-2);
+        y = Math.random(1,Game.map.rows-2);
+    }
+    while((x==Game.player.position.x && y==Game.player.position.y) ||
+        !Game.map.tiles[y*Game.map.columns+x].accessible ||
+        Game.objects[y*Game.map.columns+x]!=undefined);
+
+    var a = Math.random(0,2);
+    switch(a)
+    {
+        case 0: Game.objects[y*Game.map.columns+x] = FIRESHARD;break;
+        case 1: Game.objects[y*Game.map.columns+x] = ICESHARD;break;
+        case 2: Game.objects[y*Game.map.columns+x] = THUNDERSHARD;break;
+    }
+    Game.kstatus = Status.MAP;
+}
+
+function splitV(sx,sy,ex,ey,entry,iteration,maxiteration)
+{
+    if(++iteration>maxiteration || (ex-sx)<7 || ((ex-sx)*(ey-sy)<20))
+        return;
+    Game.map.rooms.splice(entry,1);
+    var xsplit = Math.random(sx+3,ex-3);
+    var offsplit = sx+xsplit;
+
+    splitH(sx,sy,xsplit,ey,Game.map.rooms.push({sx:sx,ex:xsplit,sy:sy,ey:ey})-1,iteration,maxiteration);
+    splitH(xsplit,sy,ex,ey,Game.map.rooms.push({sx:xsplit,sy:sy,ex:ex,ey:ey})-1,iteration,maxiteration);
+}
+
+function splitH(sx,sy,ex,ey,entry,iteration,maxiteration)
+{
+    if(++iteration>maxiteration || (ey-sy)<7 || ((ex-sx)*(ey-sy)<16))
+        return;
+
+    Game.map.rooms.splice(entry,1);
+    var ysplit = Math.random(sy+3,ey-3);
+    var offsplit = sy+ysplit;
+
+    splitV(sx,sy,ex,ysplit,Game.map.rooms.push({sx:sx,sy:sy,ex:ex,ey:ysplit})-1,iteration,maxiteration);
+    splitV(sx,ysplit,ex,ey,Game.map.rooms.push({sx:sx,sy:ysplit,ex:ex,ey:ey})-1,iteration,maxiteration);
 }
