@@ -17,6 +17,7 @@ var Game =
         kstatus:Status.INTRO,
         player:new Actor(0,0,Math.random(100,120),new Tile(false,0,0),0,0,0),
         npcs:[],
+        Xnpcs:[],
         tilesize:32,
         size:{width:800,height:600,offsetx:undefined,offsety:undefined},
         spritesheet:new Image(),
@@ -33,6 +34,7 @@ var Game =
         skillselected:undefined,
         target:1, //0 - left, 1 - up, 2 - right, 3 - down
         aimed:[], //the cells where the spell will be cast. When aiming this array is populated, to avoid reprocessing the obstables again when casting
+        oldpos:undefined, //old position for the player
     }
 Game.spritesheet.src = "spritesheet.png";
 Game.size.offsetx = Math.floor(Game.size.width/Game.tilesize/2);
@@ -80,6 +82,25 @@ function Actor(posx,posy,maxhp,sprite,fire,ice,thunder)
     this.fp=fire;
     this.ip=ice;
     this.tp=thunder;
+}
+
+function Npc(posx,posy,maxhp,sprite,fire,ice,thunder,ai)
+{
+    this.aistatus = 1; //1 = waiting, 0 = chasing
+    this.position = {x:posx, y:posy};
+    this.curhp = maxhp;
+    this.maxhp = maxhp;
+    this.model = sprite;
+    this.fp=fire;
+    this.ip=ice;
+    this.tp=thunder;
+    this.room = whichRoom(this.position.x,this.position.y);
+    this.turn = ai;
+    do
+    {
+        this.wanderingDirection = {x:Math.random(-1,1),y:Math.random(-1,1)};
+    }
+    while(this.wanderingDirection.x!=0 && this.wanderingDirection.y!=0);
 }
 
 function init()
@@ -140,6 +161,9 @@ function render()
             else
             {
                 ctx.drawImage(Game.spritesheet,currentTile.x,currentTile.y,Game.tilesize,Game.tilesize,mx*Game.tilesize+startx,my*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+
+                if(Game.npcs[my*Game.map.columns+mx]!=undefined)
+                    ctx.drawImage(Game.spritesheet,Game.npcs[my*Game.map.columns+mx].model.x,Game.npcs[my*Game.map.columns+mx].model.y,Game.tilesize,Game.tilesize,mx*Game.tilesize+startx,my*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                 var obj = Game.objects[my*Game.map.columns+mx];
                 if(obj != undefined)
                     ctx.drawImage(Game.spritesheet,obj.x,obj.y,Game.tilesize,Game.tilesize,mx*Game.tilesize+startx,my*Game.tilesize+starty,Game.tilesize,Game.tilesize);
@@ -154,10 +178,6 @@ function render()
 
     if(Game.kstatus==Status.AIM) //draw aim
         aim(Game.selected,startx,starty);
-
-    //draw NPCs
-    for(var i=0;i<Game.npcs.length;i++)
-        ctx.drawImage(Game.spritesheet,Game.npcs[i].model.x,Game.npcs[i].model.y,Game.tilesize,Game.tilesize,Game.npcs[i].position.x*Game.tilesize+startx,Game.npcs[i].position.y*Game.tilesize+starty,Game.tilesize,Game.tilesize);
 }
 
 function keybind(evt)

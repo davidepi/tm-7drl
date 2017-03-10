@@ -26,12 +26,20 @@ const BTRAP = new Tile(true,160,96);
 const BHDOOR = new Tile(true,192,96);
 const BVDOOR = new Tile(true,192,32);
 const BSTAIRS = new Item(0,96,nextLevel);
+const FIREENEMY = new Tile(false,32,0);
 
 generateMap(0);
 render();
 
 function endTurn()
 {
+    Game.npcs.forEach(function(cur, index, arr)
+        {
+            if(cur!=undefined)
+                cur.turn(Game.oldpos);
+        });
+    Game.npcs = Game.Xnpcs;
+    Game.Xnpcs = [];
     document.getElementById("turn").innerHTML = ++Game.turn;
     Game.overlay.map(propagate);
     Game.overlay=[];
@@ -52,6 +60,7 @@ function endTurn()
         console.log("You diededed!!!")
         return false;
     }
+    Game.oldpos = Game.player.position;
     return true;
 }
 
@@ -66,6 +75,7 @@ function generateMap(magnitude)
     {
         case 1:
             {
+                Game.player.model=new Tile(false,32,0);
                 enableSkills(1);
                 generateBase(15,25,15,25,2);
                 document.getElementById("title").innerHTML = 'First Floor';
@@ -73,12 +83,14 @@ function generateMap(magnitude)
             }
         case 2:
             {
+                Game.player.model=new Tile(false,64,0);
                 generateBase(20,30,20,30,3);
                 document.getElementById("title").innerHTML = 'Second Floor';
                 break;
             }
         case 3:
             {
+                Game.player.model=new Tile(false,96,0);
                 enableSkills(3);
                 generateBase(25,35,25,35,4);
                 document.getElementById("title").innerHTML = 'Third Floor';
@@ -86,6 +98,7 @@ function generateMap(magnitude)
             }
         case 4:
             {
+                Game.player.model=new Tile(false,128,0);
                 stringSwap1();
                 generateBase(30,40,30,40,4);
                 document.getElementById("title").innerHTML = 'Fourth Floor';
@@ -93,6 +106,7 @@ function generateMap(magnitude)
             }
         case 5:
             {
+                Game.player.model=new Tile(false,160,0);
                 enableSkills(5);
                 generateBase(30,40,30,40,5);
                 document.getElementById("title").innerHTML = 'Fifth Floor';
@@ -100,12 +114,14 @@ function generateMap(magnitude)
             }
         case 6:
             {
+                Game.player.model=new Tile(false,192,0);
                 generateBase(40,50,40,50,5);
                 document.getElementById("title").innerHTML = 'Sixth Floor';
                 break;
             }
         case 7:
             { 
+                Game.player.model=new Tile(false,224,0);
                 generateBase(45,55,45,55,5);
                 enableSkills(7);
                 document.getElementById("title").innerHTML = 'Seventh Floor';
@@ -114,12 +130,14 @@ function generateMap(magnitude)
             }
         case 8:
             {
+                Game.player.model=new Tile(false,224,32);
                 generateBase(50,60,50,60,6);
                 document.getElementById("title").innerHTML = 'Eight Floor';
                 break;
             }
         case 9:
             {
+                Game.player.model=new Tile(false,224,64);
                 generateBase(70,100,70,100,6);
                 enableSkills(9);
                 document.getElementById("title").innerHTML = 'Ninth Floor';
@@ -127,6 +145,7 @@ function generateMap(magnitude)
             }
         case 10:
             {
+                Game.player.model=new Tile(false,224,96);
                 document.getElementById("title").innerHTML = 'Archmage Quarters';
                 generateBase(30,40,30,40,2);
                 break;
@@ -134,7 +153,7 @@ function generateMap(magnitude)
         case 11:
             {
                 document.getElementById("title").innerHTML = 'Roof';
-                generateBase(5,8,5,8,0);
+                generateBase(8,8,8,8,0);
                 Game.objects = [];
                 break;
                 //endgame;
@@ -147,6 +166,7 @@ function generateMap(magnitude)
                 Game.player.position.y = Game.map.rows-2;
             }
     }
+    spawnEnemies(magnitude);
 }
 
 function nextLevel()
@@ -1679,10 +1699,10 @@ function generateBase(minx,maxx,miny,maxy,maxiteration)
 
 function splitV(sx,sy,ex,ey,entry,iteration,maxiteration)
 {
-    if(++iteration>maxiteration || (ex-sx)<8)
+    if(++iteration>maxiteration || (ex-sx)<12)
         return;
     Game.map.rooms.splice(entry,1);
-    var xsplit = Math.random(sx+4,ex-4);
+    var xsplit = Math.random(sx+6,ex-6);
     var offsplit = sx+xsplit;
 
     splitH(sx,sy,xsplit,ey,Game.map.rooms.push({sx:sx,ex:xsplit,sy:sy,ey:ey})-1,iteration,maxiteration);
@@ -1691,11 +1711,11 @@ function splitV(sx,sy,ex,ey,entry,iteration,maxiteration)
 
 function splitH(sx,sy,ex,ey,entry,iteration,maxiteration)
 {
-    if(++iteration>maxiteration || (ey-sy)<8)
+    if(++iteration>maxiteration || (ey-sy)<12)
         return;
 
     Game.map.rooms.splice(entry,1);
-    var ysplit = Math.random(sy+4,ey-4);
+    var ysplit = Math.random(sy+6,ey-6);
     var offsplit = sy+ysplit;
 
     splitV(sx,sy,ex,ysplit,Game.map.rooms.push({sx:sx,sy:sy,ex:ex,ey:ysplit})-1,iteration,maxiteration);
@@ -1756,4 +1776,135 @@ function whichRoom(x,y)
             y<Game.map.rooms[i].ey) //shared corner and border belong to the uppermost room
         return i;
     }
+}
+
+function spawnEnemies(level)
+{
+    switch(level)
+    {
+        case 1:
+            {
+                var spawned = new Npc(1,1,100,FIREENEMY,80,0,0,AI);
+                Game.npcs[Game.map.columns+1] = spawned;
+                Game.enemies_left++;
+                break;
+            }
+        default: break;
+    }
+}
+
+function AI(ppos) //ppos:player position
+{
+    var xtarget = 0, ytarget = 4;
+    var xthreshold = 1, ythreshold = 1;
+    if(this.aistatus == 1)
+    {
+        if(Game.player.room == this.room)
+            this.aistatus = 0; //start chasing from the next turn
+        else //roam around the room
+        {
+            var act = Math.random(1,10);
+            if(act<4 || this.wanderingDirection==undefined) //change direction
+            {
+                do
+                {
+                    this.wanderingDirection = {x:Math.random(-1,1),y:Math.random(-1,1)};
+                }
+                while(!(Math.abs(this.wanderingDirection.x)^Math.abs(this.wanderingDirection.y)));
+            }
+            var target = (this.position.y+this.wanderingDirection.y)*Game.map.columns+this.wanderingDirection.x+this.position.x;
+            var tile = Game.map.tiles[target];
+            if(tile!=undefined && tile.accessible && tile!=HDOOR && tile!=VDOOR && tile!= BHDOOR && tile!=BVDOOR &&
+               Game.overlay[target]==undefined && Game.objects[target]!=STAIRS && Game.objects[target]!=BSTAIRS)
+            {
+                this.position.x += this.wanderingDirection.x;
+                this.position.y += this.wanderingDirection.y;
+            }
+            else
+                this.wanderingDirection = undefined;
+        }
+    }
+    else if(!this.aistatus)  //chase
+    {
+        if(Game.player.room != this.room)
+            this.aistatus = 2;
+        var distancex = Math.abs(this.position.x-ppos.x);
+        var distancey = Math.abs(this.position.y-ppos.y);
+        var offsetx1 = Math.abs(distancex-xtarget); //decide if it is better to position on top or side of player
+        var offsetx2 = Math.abs(distancex-ytarget);
+        var offsety1 = Math.abs(distancey-ytarget);
+        var offsety2 = Math.abs(distancey-xtarget);
+        var movex = 0, movey = 0;
+        
+        if(offsetx1+offsety1 < offsetx2+offsety2) //align top or bottom
+        {   
+            if((!offsetx1 && !offsety1 && Math.random(1,10)<10) ||
+                (offsetx1 <= xthreshold && offsety1 <= ythreshold && Math.random(1,10)<4)) //90% casting chance when player was in range || 30% random cast when below threshold
+            {
+                debug("cast");
+            }
+            else if(offsetx1 > offsety1) //align on x
+            {
+                if((this.position.x-ppos.x)>0) //right of the alignment poin
+                    movex=distancex-xtarget>0?-1:1;  //if positive I'm too far else I'm too near
+                else
+                    movex=distancex-xtarget>0?1:-1;
+            }
+            else if(offsety1 > offsetx1)
+            {
+                if((this.position.y-ppos.y)>0) //below player
+                    movey=distancey-ytarget>0?-1:1;
+                else
+                    movey=distancey-ytarget>0?1:-1; 
+            }
+        }
+        else //align on left or right
+        {
+            if((!offsetx2 && !offsety2 && Math.random(1,10)<10) ||
+                (offsetx2 <= ythreshold && offsety2 <= xthreshold && Math.random(1,10)<4)) //90% casting chance when player was in range || 30% random cast when below threshold
+            {
+                debug("cast");
+            }
+
+            else if(offsetx2 > offsety2) //align on x
+            {
+                if((this.position.x-ppos.x)>0) //right of the alignment poin
+                    movex=distancex-ytarget>0?-1:1;  //if positive I'm too far else I'm too near
+                else
+                    movex=distancex-ytarget>0?1:-1;
+            }
+            else if(offsety2 > offsetx2)
+            {
+                if((this.position.y-ppos.y)>0) //below player
+                    movey=distancey-xtarget>0?-1:1;
+                else
+                    movey=distancey-xtarget>0?1:-1; 
+            }
+        }
+        var target = (this.position.y+movey)*Game.map.columns+movex+this.position.x;
+        var old_target = this.position.y*Game.map.columns+this.position.x;
+        var tile = Game.map.tiles[target];
+        if(tile!=undefined && tile.accessible && tile!=HDOOR && tile!=VDOOR && tile!= BHDOOR && tile!=BVDOOR &&
+           Game.overlay[target]==undefined && Game.objects[target]!=STAIRS && Game.objects[target]!=BSTAIRS &&
+            Game.Xnpcs[target]==undefined)
+        {
+            this.position.x += movex;
+            this.position.y += movey;
+        }
+
+    }
+    else if(this.aistatus == 99); //lumina spell
+    else //wait some turns
+    {
+        if(Game.player.room == this.room)
+            this.aistatus = 0;
+        else
+            this.aistatus--;
+    }
+    Game.Xnpcs[this.position.y*Game.map.columns+this.position.x] = this;
+}
+
+function cast_enemy(spell,target)
+{
+
 }
