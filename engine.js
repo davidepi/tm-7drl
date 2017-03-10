@@ -20,7 +20,7 @@ var Game =
         tilesize:32,
         size:{width:800,height:600,offsetx:undefined,offsety:undefined},
         spritesheet:new Image(),
-        map:{tiles:[],hidden:[],rows:0,columns:0,rooms:[]},
+        map:{tiles:[],hidden:[],rows:0,columns:0,rooms:[],accessible:[]},
         overlay:[],
         Xoverlay:[], //overlay next turn
         objects:[],
@@ -92,6 +92,12 @@ function render()
     ctx.fillStyle="#222";
     ctx.fillRect(0,0,Game.size.width,Game.size.height);
     ctx.fillStyle="#000";
+    if(Game.level==11)
+    {
+        ctx.fillStyle="SkyBlue";
+        ctx.fillRect(0,0,Game.size.width,Game.size.height);
+        ctx.fillStyle="#000";
+    }
 
     var initx = 0; //iterator for the columns
     var inity = 0; //iterator for the rows
@@ -182,6 +188,14 @@ function keybind(evt)
                                 next_status = Status.MAP;
                                 break;
                             }
+
+                        var tile = Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x]; //UPDATE ROOM AND UNCOVER AREA
+                        if(tile==VDOOR || tile==BVDOOR) //update room
+                        {
+                            Game.player.room = whichRoom(Game.player.position.x-1,Game.player.position.y);
+                            if(Game.map.hidden[Game.player.position.y*Game.map.columns+Game.player.position.x-1]==1) //if hidden uncover area
+                                uncover(Game.player.position.x-1,Game.player.position.y,Game.player.room);
+                        }
 
                         Game.player.position.x--;
                         trigger_turn = true;
@@ -307,6 +321,14 @@ function keybind(evt)
                                 break;
                             }
 
+                        var tile = Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x]; //UPDATE ROOM AND UNCOVER AREA
+                        if(tile==HDOOR || tile==BHDOOR) //update room
+                        {
+                            Game.player.room = whichRoom(Game.player.position.x,Game.player.position.y-1);
+                            if(Game.map.hidden[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x]==1) //if hidden uncover area
+                                uncover(Game.player.position.x,Game.player.position.y-1,Game.player.room);
+                        }
+
                         Game.player.position.y--;
                         if(Game.skills[7])
                         {
@@ -398,6 +420,14 @@ function keybind(evt)
                                 next_status = Status.MAP;
                                 break;
                             }
+
+                        var tile = Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x]; //UPDATE ROOM AND UNCOVER AREA
+                        if(tile==VDOOR || tile==BVDOOR) //update room
+                        {
+                            Game.player.room = whichRoom(Game.player.position.x+1,Game.player.position.y);
+                            if(Game.map.hidden[Game.player.position.y*Game.map.columns+Game.player.position.x+1]==1) //if hidden uncover area
+                                uncover(Game.player.position.x+1,Game.player.position.y,Game.player.room);
+                        }
 
                         Game.player.position.x++;
                         trigger_turn = true;
@@ -523,6 +553,14 @@ function keybind(evt)
                                 next_status = Status.MAP;
                                 break;
                             }
+
+                        var tile = Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x]; //UPDATE ROOM AND UNCOVER AREA
+                        if(tile==HDOOR || tile==BHDOOR) //update room
+                        {
+                            Game.player.room = whichRoom(Game.player.position.x,Game.player.position.y+1);
+                            if(Game.map.hidden[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x]==1) //if hidden uncover area
+                                uncover(Game.player.position.x,Game.player.position.y+1,Game.player.room);
+                        }
 
                         Game.player.position.y++;
                         trigger_turn = true;

@@ -80,28 +80,33 @@ function generateMap(magnitude)
         case 3:
             {
                 enableSkills(3);
+                generateBase(25,35,25,35,4);
                 document.getElementById("title").innerHTML = 'Third Floor';
                 break;
             }
         case 4:
             {
                 stringSwap1();
+                generateBase(30,40,30,40,4);
                 document.getElementById("title").innerHTML = 'Fourth Floor';
                 break;
             }
         case 5:
             {
                 enableSkills(5);
+                generateBase(30,40,30,40,5);
                 document.getElementById("title").innerHTML = 'Fifth Floor';
                 break;
             }
         case 6:
             {
+                generateBase(40,50,40,50,5);
                 document.getElementById("title").innerHTML = 'Sixth Floor';
                 break;
             }
         case 7:
-            {
+            { 
+                generateBase(45,55,45,55,5);
                 enableSkills(7);
                 document.getElementById("title").innerHTML = 'Seventh Floor';
                 stringSwap2();
@@ -109,11 +114,13 @@ function generateMap(magnitude)
             }
         case 8:
             {
+                generateBase(50,60,50,60,6);
                 document.getElementById("title").innerHTML = 'Eight Floor';
                 break;
             }
         case 9:
             {
+                generateBase(70,100,70,100,6);
                 enableSkills(9);
                 document.getElementById("title").innerHTML = 'Ninth Floor';
                 break;
@@ -121,16 +128,21 @@ function generateMap(magnitude)
         case 10:
             {
                 document.getElementById("title").innerHTML = 'Archmage Quarters';
+                generateBase(30,40,30,40,2);
+                break;
             }
         case 11:
             {
-                document.getElementById("title").innerHTML = 'Tower of Magi - Roof';
+                document.getElementById("title").innerHTML = 'Roof';
+                generateBase(5,8,5,8,0);
+                Game.objects = [];
+                break;
                 //endgame;
             }
         default:
             {
                 generateBase(10,20,10,20,0);
-                document.getElementById("title").innerHTML = 'Tower of Magi - Ground Floor';break;
+                document.getElementById("title").innerHTML = 'Ground Floor';break;
                 Game.player.position.x = Math.random(1,Game.map.columns-2);
                 Game.player.position.y = Game.map.rows-2;
             }
@@ -182,7 +194,7 @@ function increaseFire()
         Game.player.curhp = Game.player.maxhp;
     if(oldvalue == 0 && Game.player.ip == 0 && Game.player.tp == 0)
     {
-        Game.player.fp = 30;
+        Game.player.fp = 50;
         Game.abilities[0] = 1;
         document.getElementById("f1").innerHTML = "Fire";
         Game.enemies_left--;
@@ -230,7 +242,7 @@ function increaseIce()
         Game.player.curhp = Game.player.maxhp;
     if(oldvalue == 0 && Game.player.fp == 0 && Game.player.tp == 0)
     {
-        Game.player.ip = 30;
+        Game.player.ip = 50;
         Game.abilities[1] = 1;
         document.getElementById("g1").innerHTML = "Frost";
         Game.enemies_left--;
@@ -279,7 +291,7 @@ function increaseThunder()
         Game.player.curhp = Game.player.maxhp;
     if(oldvalue == 0 && Game.player.ip == 0 && Game.player.fp == 0)
     {
-        Game.player.tp = 30;
+        Game.player.tp = 50;
         Game.abilities[2] = 1;
         document.getElementById("t1").innerHTML = "Spark";
         Game.enemies_left--;
@@ -1428,6 +1440,7 @@ function generateBase(minx,maxx,miny,maxy,maxiteration)
     Game.map.rows = Math.random(minx,maxx);
     Game.map.columns = Math.random(miny,maxy);
     Game.map.rooms = [{sx:0,sy:0,ex:Game.map.columns-1,ey:Game.map.rows-1}];
+    Game.map.accessible = [];
     Math.random(0,1)==0?
         splitV(0,0,Game.map.columns-1,Game.map.rows-1,0,0,maxiteration):
         splitH(0,0,Game.map.columns-1,Game.map.rows-1,0,0,maxiteration);
@@ -1439,7 +1452,7 @@ function generateBase(minx,maxx,miny,maxy,maxiteration)
             for(var x=element.sx;x<=element.ex;x++)
             {
                 ind = y*Game.map.columns+x;
-                Game.map.hidden[ind] = 0;
+                Game.map.hidden[ind] = 1;
                 if(x==element.sx || x==element.ex && Game.map.tiles[ind]==undefined)
                     Game.map.tiles[ind] = VWALL;
                 else if(y==element.sy || y==element.ey && Game.map.tiles[ind]==undefined)
@@ -1453,13 +1466,13 @@ function generateBase(minx,maxx,miny,maxy,maxiteration)
         //top left
         ind = element.sy*Game.map.columns+element.sx;
         if(Game.map.tiles[ind-1]!=WOOD && element.sx!=0)
-            if(Game.map.tiles[(element.sy-1)*Game.map.columns+element.sx]==VWALL)
+            if(Game.map.tiles[(element.sy-1)*Game.map.columns+element.sx]!=WOOD && element.sy!=0)
                 Game.map.tiles[ind]=XWALL;
             else
                 Game.map.tiles[ind]=TDOWN;
 
         else
-                if(Game.map.tiles[(element.sy-1)*Game.map.columns+element.sx]==VWALL)
+                if(Game.map.tiles[(element.sy-1)*Game.map.columns+element.sx]!=WOOD && element.sy!=0)
                     Game.map.tiles[ind] = TRIGHT;
                 else
                     Game.map.tiles[ind] = TLCORNER;
@@ -1468,13 +1481,13 @@ function generateBase(minx,maxx,miny,maxy,maxiteration)
         if(Game.map.tiles[ind]==VWALL || Game.map.tiles[ind]==HWALL) //otherwise already processed
         {
             if(Game.map.tiles[ind+1]!=WOOD && element.ex!=Game.map.columns-1)
-                if(Game.map.tiles[(element.sy-1)*Game.map.columns+element.ex]==VWALL)
+                if(Game.map.tiles[(element.sy-1)*Game.map.columns+element.ex]!=WOOD && element.sy!=0)
                     Game.map.tiles[ind]=XWALL;
                 else
                     Game.map.tiles[ind]=TDOWN;
 
             else
-                if(Game.map.tiles[(element.sy-1)*Game.map.columns+element.ex]==VWALL)
+                if(Game.map.tiles[(element.sy-1)*Game.map.columns+element.ex]!=WOOD && element.sy!=0)
                     Game.map.tiles[ind] = TLEFT;
                 else
                     Game.map.tiles[ind] = TRCORNER;
@@ -1484,13 +1497,13 @@ function generateBase(minx,maxx,miny,maxy,maxiteration)
         if(Game.map.tiles[ind]==VWALL || Game.map.tiles[ind]==HWALL)
         {
         if(Game.map.tiles[ind-1]!=WOOD && element.sx!=0)
-            if(Game.map.tiles[(element.ey+1)*Game.map.columns+element.sx]==VWALL)
+            if(Game.map.tiles[(element.ey+1)*Game.map.columns+element.sx]!=WOOD && element.ey!=Game.map.rows-1)
                 Game.map.tiles[ind]=XWALL;
             else
                 Game.map.tiles[ind]=TUP;
 
         else
-                if(Game.map.tiles[(element.ey+1)*Game.map.columns+element.sx]==VWALL)
+                if(Game.map.tiles[(element.ey+1)*Game.map.columns+element.sx]!=WOOD && element.ey!=Game.map.rows-1)
                     Game.map.tiles[ind] = TRIGHT;
                 else
                     Game.map.tiles[ind] = BLCORNER;
@@ -1501,13 +1514,13 @@ function generateBase(minx,maxx,miny,maxy,maxiteration)
         if(Game.map.tiles[ind]==VWALL || Game.map.tiles[ind]==HWALL)
         {
         if(Game.map.tiles[ind+1]!=WOOD && element.ex!=Game.map.columns-1)
-            if(Game.map.tiles[(element.ey+1)*Game.map.columns+element.ex]==VWALL)
+            if(Game.map.tiles[(element.ey+1)*Game.map.columns+element.ex]!=WOOD && element.ey!=Game.map.rows-1)
                 Game.map.tiles[ind]=XWALL;
             else
                 Game.map.tiles[ind]=TUP;
 
         else
-                if(Game.map.tiles[(element.ey+1)*Game.map.columns+element.ex]==VWALL)
+                if(Game.map.tiles[(element.ey+1)*Game.map.columns+element.ex]!=WOOD && element.ey!=Game.map.rows-1)
                     Game.map.tiles[ind] = TLEFT;
                 else
                     Game.map.tiles[ind] = BRCORNER;
@@ -1522,8 +1535,8 @@ function generateBase(minx,maxx,miny,maxy,maxiteration)
         var door_position;
         while(!generated_doors && Game.map.rooms.length>1) //at least one door per room
         {
-            nrooms = Math.random(0,15);
-            
+
+            nrooms = Math.random(1,15);
             if(nrooms & 0x1 && element.sx!=0)
             {
                 already_door = false;
@@ -1617,13 +1630,25 @@ function generateBase(minx,maxx,miny,maxy,maxiteration)
     Game.player.position.y = Math.random(Game.map.rooms[room].sy+2,Game.map.rooms[room].ey-2);
     if(Game.level>0)
         Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x]=TRAP;
+    floodFill_accessible(Game.player.position.x,Game.player.position.y);
+    
+    //remove non accessible rooms
+    Game.map.rooms.slice().reverse().forEach(function(item, index, object) {
+        if(Game.map.accessible[Math.floor((item.sy+item.ey)/2)*Game.map.columns+Math.floor((item.sx+item.ex)/2)]==undefined)
+            Game.map.rooms.splice(object.length - 1 - index, 1);
+    });
 
+    //uncover spawn room
+    Game.player.room = whichRoom(Game.player.position.x,Game.player.position.y);
+    uncover(Game.player.position.x,Game.player.position.y,Game.player.room);
+    
     //stairs
     var x,y;
     do
     {
-        x = Math.random(1,Game.map.columns-2);
-        y = Math.random(1,Game.map.rows-2);
+        room = Math.random(0,Game.map.rooms.length-1);
+        x = Math.random(Game.map.rooms[room].sx+2,Game.map.rooms[room].ex-2);
+        y = Math.random(Game.map.rooms[room].sy+2,Game.map.rooms[room].ey-2);
     }
     while((x==Game.player.position.x && y==Game.player.position.y) ||
         !Game.map.tiles[y*Game.map.columns+x].accessible ||
@@ -1632,12 +1657,15 @@ function generateBase(minx,maxx,miny,maxy,maxiteration)
     Game.objects[y*Game.map.columns+x] = STAIRS;
     do
     {
-        x = Math.random(1,Game.map.columns-2);
-        y = Math.random(1,Game.map.rows-2);
+        room = Math.random(0,Game.map.rooms.length-1);
+        x = Math.random(Game.map.rooms[room].sx+2,Game.map.rooms[room].ex-2);
+        y = Math.random(Game.map.rooms[room].sy+2,Game.map.rooms[room].ey-2);
     }
     while((x==Game.player.position.x && y==Game.player.position.y) ||
         !Game.map.tiles[y*Game.map.columns+x].accessible ||
-        Game.objects[y*Game.map.columns+x]!=undefined);
+        Game.objects[y*Game.map.columns+x]!=undefined || 
+        Game.map.tiles[y*Game.map.columns+x]==HDOOR ||
+        Game.map.tiles[y*Game.map.columns+x]==VDOOR);
 
     var a = Math.random(0,2);
     switch(a)
@@ -1672,4 +1700,60 @@ function splitH(sx,sy,ex,ey,entry,iteration,maxiteration)
 
     splitV(sx,sy,ex,ysplit,Game.map.rooms.push({sx:sx,sy:sy,ex:ex,ey:ysplit})-1,iteration,maxiteration);
     splitV(sx,ysplit,ex,ey,Game.map.rooms.push({sx:sx,sy:ysplit,ex:ex,ey:ey})-1,iteration,maxiteration);
+}
+var counter = 0;
+function floodFill_accessible(x,y)
+{
+    if(Game.map.accessible[y*Game.map.columns+x]==1)
+        return;
+    var tile = Game.map.tiles[y*Game.map.columns+x];
+    if(tile==undefined)
+        return;
+    if(tile.accessible)
+    {
+        Game.map.accessible[y*Game.map.columns+x]=1;
+        floodFill_accessible(x+1,y);
+        floodFill_accessible(x-1,y);
+        floodFill_accessible(x,y+1);
+        floodFill_accessible(x,y-1);
+    }
+}
+
+function floodFill_uncover(x,y)
+{
+    if(Game.map.hidden[y*Game.map.columns+x]==0)
+        return;
+    var tile = Game.map.tiles[y*Game.map.columns+x];
+    if(tile==undefined)
+        return;
+    Game.map.hidden[y*Game.map.columns+x] = 0;
+    if(tile.accessible && tile!=HDOOR && tile!=VDOOR && tile!=BHDOOR && tile!=BVDOOR)
+    {
+        floodFill_uncover(x+1,y);
+        floodFill_uncover(x-1,y);
+        floodFill_uncover(x,y+1);
+        floodFill_uncover(x,y-1);
+    }
+}
+
+function uncover(x,y,room)
+{
+    floodFill_uncover(x,y); 
+    Game.map.hidden[Game.map.rooms[room].sy*Game.map.columns+Game.map.rooms[room].sx]=0;
+    Game.map.hidden[Game.map.rooms[room].sy*Game.map.columns+Game.map.rooms[room].ex]=0;
+    Game.map.hidden[Game.map.rooms[room].ey*Game.map.columns+Game.map.rooms[room].sx]=0;
+    Game.map.hidden[Game.map.rooms[room].ey*Game.map.columns+Game.map.rooms[room].ex]=0;
+
+}
+
+function whichRoom(x,y)
+{
+    for(var i=0;i<Game.map.rooms.length;i++)
+    {
+        if(x>=Game.map.rooms[i].sx &&
+           x<Game.map.rooms[i].ex  && //shared corner and border belong to the leftmost room
+            y>=Game.map.rooms[i].sy &&
+            y<Game.map.rooms[i].ey) //shared corner and border belong to the uppermost room
+        return i;
+    }
 }
