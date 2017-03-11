@@ -26,21 +26,21 @@ const BTRAP = new Tile(true,160,96);
 const BHDOOR = new Tile(true,192,96);
 const BVDOOR = new Tile(true,192,32);
 const BSTAIRS = new Item(0,96,nextLevel);
-const FIREENEMY = new Tile(false,32,0);
+const ENEMY = new Tile(false,224,128);
+const ENEMYALERT = new Tile(false,256,0);
+const ENEMYGONE = new Tile(false,256,32);
 
 generateMap(0);
 render();
 
 function endTurn()
 {
+    document.getElementById("turn").innerHTML = ++Game.turn;
     Game.npcs.forEach(function(cur, index, arr)
         {
             if(cur!=undefined)
-                cur.turn(Game.oldpos);
+                cur.act(Game.oldpos);
         });
-    Game.npcs = Game.Xnpcs;
-    Game.Xnpcs = [];
-    document.getElementById("turn").innerHTML = ++Game.turn;
     Game.overlay.map(propagate);
     Game.overlay=[];
     Game.overlay=Game.Xoverlay;
@@ -48,8 +48,9 @@ function endTurn()
     if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x]!=undefined)
         if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x].type==0 && !Game.skills[8])
         {
-            Game.player.curhp-=10;
-            console.log("Don't play with fire! You lose 10Hp");
+            var remove = Math.floor(Math.random(0,(10*Game.level)+1)*Game.firemultiplier+1);
+            Game.player.curhp-=remove;
+            console.log(Strings.fireplayer[0]+remove+Strings.fireplayer[1]);
         }
     document.getElementById("hp").innerHTML = Game.player.curhp+"/"+Game.player.maxhp;
     document.getElementById("fr").innerHTML = Game.player.fp+"%";
@@ -375,7 +376,7 @@ function aim(spell,startx,starty)
                         Game.map.tiles[(Game.player.position.y+3*yaim)*Game.map.columns+(Game.player.position.x+offsetx)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x,y:Game.player.position.y+3*yaim});
+                        Game.aimed.push({x:Game.player.position.x,y:Game.player.position.y+3*yaim,caster:Game.player,type:"f1"});
                         ctx.fillRect((Game.player.position.x+offsetx)*Game.tilesize+startx,(Game.player.position.y+offsety)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                     }
                     else
@@ -390,7 +391,7 @@ function aim(spell,startx,starty)
                         Game.map.tiles[(Game.player.position.y+3*yaim)*Game.map.columns+(Game.player.position.x-4)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x-4,y:Game.player.position.y+3*yaim});
+                        Game.aimed.push({x:Game.player.position.x-4,y:Game.player.position.y+3*yaim,caster:Game.player,type:"f1"});
                         ctx.fillRect((Game.player.position.x-4)*Game.tilesize+startx,(Game.player.position.y+offsety)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                     }
                     else
@@ -404,7 +405,7 @@ function aim(spell,startx,starty)
                         Game.map.tiles[(Game.player.position.y+3*yaim)*Game.map.columns+(Game.player.position.x+4)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x+4,y:Game.player.position.y+3*yaim});
+                        Game.aimed.push({x:Game.player.position.x+4,y:Game.player.position.y+3*yaim,caster:Game.player,type:"f1"});
                         ctx.fillRect((Game.player.position.x+4)*Game.tilesize+startx,(Game.player.position.y+offsety)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                     }
                     else
@@ -424,7 +425,7 @@ function aim(spell,startx,starty)
                         Game.map.tiles[(Game.player.position.y+3*yaim)*Game.map.columns+(Game.player.position.x+offsetx)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x,y:Game.player.position.y+3*yaim});
+                        Game.aimed.push({x:Game.player.position.x,y:Game.player.position.y+3*yaim,caster:Game.player,type:"f2"});
                         ctx.fillRect((Game.player.position.x+offsetx)*Game.tilesize+startx,(Game.player.position.y+offsety)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                     }
                     else
@@ -437,13 +438,13 @@ function aim(spell,startx,starty)
                         Game.map.tiles[(Game.player.position.y+3*yaim)*Game.map.columns+(Game.player.position.x-2)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x-2,y:Game.player.position.y+3*yaim});
+                        Game.aimed.push({x:Game.player.position.x-2,y:Game.player.position.y+3*yaim,caster:Game.player,type:"f2"});
                         ctx.fillRect((Game.player.position.x-2)*Game.tilesize+startx,(Game.player.position.y+offsety)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         if(Game.map.tiles[(Game.player.position.y+3*yaim)*Game.map.columns+(Game.player.position.x-3)].accessible && //left branch accessible
                             Game.map.tiles[(Game.player.position.y+3*yaim)*Game.map.columns+(Game.player.position.x-4)].accessible)
                         {
                             ctx.fillStyle = "rgba(0,150,0,0.5)";
-                            Game.aimed.push({x:Game.player.position.x-4,y:Game.player.position.y+3*yaim});
+                            Game.aimed.push({x:Game.player.position.x-4,y:Game.player.position.y+3*yaim,caster:Game.player,type:"f2"});
                             ctx.fillRect((Game.player.position.x-4)*Game.tilesize+startx,(Game.player.position.y+offsety)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         }
                         else
@@ -461,13 +462,13 @@ function aim(spell,startx,starty)
                         Game.map.tiles[(Game.player.position.y+3*yaim)*Game.map.columns+(Game.player.position.x+2)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x+2,y:Game.player.position.y+3*yaim});
+                        Game.aimed.push({x:Game.player.position.x+2,y:Game.player.position.y+3*yaim,caster:Game.player,type:"f2"});
                         ctx.fillRect((Game.player.position.x+2)*Game.tilesize+startx,(Game.player.position.y+offsety)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         if(Game.map.tiles[(Game.player.position.y+3*yaim)*Game.map.columns+(Game.player.position.x+3)].accessible && //left branch accessible
                             Game.map.tiles[(Game.player.position.y+3*yaim)*Game.map.columns+(Game.player.position.x+4)].accessible)
                         {
                             ctx.fillStyle = "rgba(0,150,0,0.5)";
-                            Game.aimed.push({x:Game.player.position.x+4,y:Game.player.position.y+3*yaim});
+                            Game.aimed.push({x:Game.player.position.x+4,y:Game.player.position.y+3*yaim,caster:Game.player,type:"f2"});
                             ctx.fillRect((Game.player.position.x+4)*Game.tilesize+startx,(Game.player.position.y+offsety)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         }
                         else
@@ -493,7 +494,7 @@ function aim(spell,startx,starty)
                         Game.map.tiles[(Game.player.position.y+3*yaim)*Game.map.columns+(Game.player.position.x+offsetx)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x,y:Game.player.position.y+3*yaim});
+                        Game.aimed.push({x:Game.player.position.x,y:Game.player.position.y+3*yaim,caster:Game.player,type:"f3"});
                         ctx.fillRect((Game.player.position.x+offsetx)*Game.tilesize+startx,(Game.player.position.y+offsety)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                     }
                     else
@@ -505,22 +506,22 @@ function aim(spell,startx,starty)
                     if(Game.map.tiles[(Game.player.position.y+3*yaim)*Game.map.columns+(Game.player.position.x-1)].accessible) //left branch accessible
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x-1,y:Game.player.position.y+3*yaim});
+                        Game.aimed.push({x:Game.player.position.x-1,y:Game.player.position.y+3*yaim,caster:Game.player,type:"f3"});
                         ctx.fillRect((Game.player.position.x-1)*Game.tilesize+startx,(Game.player.position.y+offsety)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         if(Game.map.tiles[(Game.player.position.y+3*yaim)*Game.map.columns+(Game.player.position.x-2)].accessible)
                         {
                             ctx.fillStyle = "rgba(0,150,0,0.5)";
-                            Game.aimed.push({x:Game.player.position.x-2,y:Game.player.position.y+3*yaim});
+                            Game.aimed.push({x:Game.player.position.x-2,y:Game.player.position.y+3*yaim,caster:Game.player,type:"f3"});
                             ctx.fillRect((Game.player.position.x-2)*Game.tilesize+startx,(Game.player.position.y+offsety)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                             if(Game.map.tiles[(Game.player.position.y+3*yaim)*Game.map.columns+(Game.player.position.x-3)].accessible)
                             {
                                 ctx.fillStyle = "rgba(0,150,0,0.5)";
-                                Game.aimed.push({x:Game.player.position.x-3,y:Game.player.position.y+3*yaim});
+                                Game.aimed.push({x:Game.player.position.x-3,y:Game.player.position.y+3*yaim,caster:Game.player,type:"f3"});
                                 ctx.fillRect((Game.player.position.x-3)*Game.tilesize+startx,(Game.player.position.y+offsety)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                                 if(Game.map.tiles[(Game.player.position.y+3*yaim)*Game.map.columns+(Game.player.position.x-4)].accessible)
                                 {
                                     ctx.fillStyle = "rgba(0,150,0,0.5)";
-                                    Game.aimed.push({x:Game.player.position.x-4,y:Game.player.position.y+3*yaim});
+                                    Game.aimed.push({x:Game.player.position.x-4,y:Game.player.position.y+3*yaim,caster:Game.player,type:"f3"});
                                     ctx.fillRect((Game.player.position.x-4)*Game.tilesize+startx,(Game.player.position.y+offsety)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                                 }
                                 else
@@ -551,22 +552,22 @@ function aim(spell,startx,starty)
                     if(Game.map.tiles[(Game.player.position.y+3*yaim)*Game.map.columns+(Game.player.position.x+1)].accessible) //right branch accessible
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x+1,y:Game.player.position.y+3*yaim});
+                        Game.aimed.push({x:Game.player.position.x+1,y:Game.player.position.y+3*yaim,caster:Game.player,type:"f3"});
                         ctx.fillRect((Game.player.position.x+1)*Game.tilesize+startx,(Game.player.position.y+offsety)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         if(Game.map.tiles[(Game.player.position.y+3*yaim)*Game.map.columns+(Game.player.position.x+2)].accessible)
                         {
                             ctx.fillStyle = "rgba(0,150,0,0.5)";
-                            Game.aimed.push({x:Game.player.position.x+2,y:Game.player.position.y+3*yaim});
+                            Game.aimed.push({x:Game.player.position.x+2,y:Game.player.position.y+3*yaim,caster:Game.player,type:"f3"});
                             ctx.fillRect((Game.player.position.x+2)*Game.tilesize+startx,(Game.player.position.y+offsety)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                             if(Game.map.tiles[(Game.player.position.y+3*yaim)*Game.map.columns+(Game.player.position.x+3)].accessible)
                             {
                                 ctx.fillStyle = "rgba(0,150,0,0.5)";
-                                Game.aimed.push({x:Game.player.position.x+3,y:Game.player.position.y+3*yaim});
+                                Game.aimed.push({x:Game.player.position.x+3,y:Game.player.position.y+3*yaim,caster:Game.player,type:"f3"});
                                 ctx.fillRect((Game.player.position.x+3)*Game.tilesize+startx,(Game.player.position.y+offsety)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                                 if(Game.map.tiles[(Game.player.position.y+3*yaim)*Game.map.columns+(Game.player.position.x+4)].accessible)
                                 {
                                     ctx.fillStyle = "rgba(0,150,0,0.5)";
-                                    Game.aimed.push({x:Game.player.position.x+4,y:Game.player.position.y+3*yaim});
+                                    Game.aimed.push({x:Game.player.position.x+4,y:Game.player.position.y+3*yaim,caster:Game.player,type:"f3"});
                                     ctx.fillRect((Game.player.position.x+4)*Game.tilesize+startx,(Game.player.position.y+offsety)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                                 }
                                 else
@@ -602,7 +603,7 @@ function aim(spell,startx,starty)
                         Game.map.tiles[(Game.player.position.y+2*yaim)*Game.map.columns+(Game.player.position.x+offsetx)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x,y:Game.player.position.y+2*yaim});
+                        Game.aimed.push({x:Game.player.position.x,y:Game.player.position.y+2*yaim,caster:Game.player,type:"g1"});
                         ctx.fillRect((Game.player.position.x+offsetx)*Game.tilesize+startx,(Game.player.position.y+offsety)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                     }
                     else
@@ -614,7 +615,7 @@ function aim(spell,startx,starty)
                     if(Game.map.tiles[(Game.player.position.y+2*yaim)*Game.map.columns+(Game.player.position.x-1)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x-1,y:Game.player.position.y+2*yaim});
+                        Game.aimed.push({x:Game.player.position.x-1,y:Game.player.position.y+2*yaim,caster:Game.player,type:"g1"});
                         ctx.fillRect((Game.player.position.x-1)*Game.tilesize+startx,(Game.player.position.y+offsety)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                     }
                     else
@@ -625,7 +626,7 @@ function aim(spell,startx,starty)
                     if(Game.map.tiles[(Game.player.position.y+2*yaim)*Game.map.columns+(Game.player.position.x+1)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x+1,y:Game.player.position.y+2*yaim});
+                        Game.aimed.push({x:Game.player.position.x+1,y:Game.player.position.y+2*yaim,caster:Game.player,type:"g1"});
                         ctx.fillRect((Game.player.position.x+1)*Game.tilesize+startx,(Game.player.position.y+offsety)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                     }
                     else
@@ -641,7 +642,7 @@ function aim(spell,startx,starty)
                         Game.map.tiles[(Game.player.position.y+2*yaim)*Game.map.columns+(Game.player.position.x)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x,y:Game.player.position.y+2*yaim});
+                        Game.aimed.push({x:Game.player.position.x,y:Game.player.position.y+2*yaim,caster:Game.player,type:"g2"});
                         ctx.fillRect((Game.player.position.x)*Game.tilesize+startx,(Game.player.position.y+2*yaim)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                     }
                     else
@@ -654,13 +655,13 @@ function aim(spell,startx,starty)
                     if(Game.map.tiles[(Game.player.position.y+2*yaim)*Game.map.columns+(Game.player.position.x-1)].accessible) //left branch
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x-1,y:Game.player.position.y+2*yaim});
+                        Game.aimed.push({x:Game.player.position.x-1,y:Game.player.position.y+2*yaim,caster:Game.player,type:"g2"});
                         ctx.fillRect((Game.player.position.x-1)*Game.tilesize+startx,(Game.player.position.y+2*yaim)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         if(Game.map.tiles[(Game.player.position.y+2*yaim)*Game.map.columns+(Game.player.position.x-2)].accessible &&
                             Game.map.tiles[(Game.player.position.y+yaim)*Game.map.columns+(Game.player.position.x-2)].accessible)
                         {
                             ctx.fillStyle = "rgba(0,150,0,0.5)";
-                            Game.aimed.push({x:Game.player.position.x-2,y:Game.player.position.y+1*yaim});
+                            Game.aimed.push({x:Game.player.position.x-2,y:Game.player.position.y+1*yaim,caster:Game.player,type:"g2"});
                             ctx.fillRect((Game.player.position.x-2)*Game.tilesize+startx,(Game.player.position.y+1*yaim)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         }
                         else
@@ -678,13 +679,13 @@ function aim(spell,startx,starty)
                     if(Game.map.tiles[(Game.player.position.y+2*yaim)*Game.map.columns+(Game.player.position.x+1)].accessible) //right branch
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x+1,y:Game.player.position.y+2*yaim});
+                        Game.aimed.push({x:Game.player.position.x+1,y:Game.player.position.y+2*yaim,caster:Game.player,type:"g2"});
                         ctx.fillRect((Game.player.position.x+1)*Game.tilesize+startx,(Game.player.position.y+2*yaim)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         if(Game.map.tiles[(Game.player.position.y+2*yaim)*Game.map.columns+(Game.player.position.x+2)].accessible &&
                             Game.map.tiles[(Game.player.position.y+yaim)*Game.map.columns+(Game.player.position.x+2)].accessible)
                         {
                             ctx.fillStyle = "rgba(0,150,0,0.5)";
-                            Game.aimed.push({x:Game.player.position.x+2,y:Game.player.position.y+1*yaim});
+                            Game.aimed.push({x:Game.player.position.x+2,y:Game.player.position.y+1*yaim,caster:Game.player,type:"g2"});
                             ctx.fillRect((Game.player.position.x+2)*Game.tilesize+startx,(Game.player.position.y+1*yaim)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         }
                         else
@@ -706,7 +707,7 @@ function aim(spell,startx,starty)
                     if(Game.map.tiles[(Game.player.position.y+yaim)*Game.map.columns+(Game.player.position.x)].accessible)//path in front of player
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x,y:Game.player.position.y+yaim});
+                        Game.aimed.push({x:Game.player.position.x,y:Game.player.position.y+yaim,caster:Game.player,type:"g3"});
                         ctx.fillRect((Game.player.position.x)*Game.tilesize+startx,(Game.player.position.y+yaim)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                     }
                     else
@@ -720,14 +721,14 @@ function aim(spell,startx,starty)
                         Game.map.tiles[(Game.player.position.y+2*yaim)*Game.map.columns+(Game.player.position.x-1)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x-1,y:Game.player.position.y+2*yaim});
+                        Game.aimed.push({x:Game.player.position.x-1,y:Game.player.position.y+2*yaim,caster:Game.player,type:"g3"});
                         ctx.fillRect((Game.player.position.x-1)*Game.tilesize+startx,(Game.player.position.y+2*yaim)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         if(Game.map.tiles[(Game.player.position.y+yaim)*Game.map.columns+(Game.player.position.x-2)].accessible &&
                             Game.map.tiles[(Game.player.position.y+2*yaim)*Game.map.columns+(Game.player.position.x-2)].accessible &&
                             Game.map.tiles[(Game.player.position.y+3*yaim)*Game.map.columns+(Game.player.position.x-2)].accessible)
                         {
                             ctx.fillStyle = "rgba(0,150,0,0.5)";
-                            Game.aimed.push({x:Game.player.position.x-2,y:Game.player.position.y+3*yaim});
+                            Game.aimed.push({x:Game.player.position.x-2,y:Game.player.position.y+3*yaim,caster:Game.player,type:"g3"});
                             ctx.fillRect((Game.player.position.x-2)*Game.tilesize+startx,(Game.player.position.y+3*yaim)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         }
                         else
@@ -746,14 +747,14 @@ function aim(spell,startx,starty)
                         Game.map.tiles[(Game.player.position.y+2*yaim)*Game.map.columns+(Game.player.position.x+1)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x+1,y:Game.player.position.y+2*yaim});
+                        Game.aimed.push({x:Game.player.position.x+1,y:Game.player.position.y+2*yaim,caster:Game.player,type:"g3"});
                         ctx.fillRect((Game.player.position.x+1)*Game.tilesize+startx,(Game.player.position.y+2*yaim)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         if(Game.map.tiles[(Game.player.position.y+yaim)*Game.map.columns+(Game.player.position.x+2)].accessible &&
                             Game.map.tiles[(Game.player.position.y+2*yaim)*Game.map.columns+(Game.player.position.x+2)].accessible &&
                             Game.map.tiles[(Game.player.position.y+3*yaim)*Game.map.columns+(Game.player.position.x+2)].accessible)
                         {
                             ctx.fillStyle = "rgba(0,150,0,0.5)";
-                            Game.aimed.push({x:Game.player.position.x+2,y:Game.player.position.y+3*yaim});
+                            Game.aimed.push({x:Game.player.position.x+2,y:Game.player.position.y+3*yaim,caster:Game.player,type:"g3"});
                             ctx.fillRect((Game.player.position.x+2)*Game.tilesize+startx,(Game.player.position.y+3*yaim)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         }
                         else
@@ -779,7 +780,7 @@ function aim(spell,startx,starty)
                         Game.map.tiles[(Game.player.position.y+4*yaim)*Game.map.columns+(Game.player.position.x)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x,y:Game.player.position.y+4*yaim});
+                        Game.aimed.push({x:Game.player.position.x,y:Game.player.position.y+4*yaim,caster:Game.player,type:Game.selected});
                     }
                     else
                         ctx.fillStyle = "rgba(150,0,0,0.5)";
@@ -800,7 +801,7 @@ function aim(spell,startx,starty)
                         Game.map.tiles[(Game.player.position.y)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y});
+                        Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y,caster:Game.player,type:Game.selected});
                         ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                     }
                     else
@@ -815,7 +816,7 @@ function aim(spell,startx,starty)
                         Game.map.tiles[(Game.player.position.y-4)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y-4});
+                        Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y-4,caster:Game.player,type:Game.selected});
                         ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y-4)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                     }
                     else
@@ -829,7 +830,7 @@ function aim(spell,startx,starty)
                         Game.map.tiles[(Game.player.position.y+4)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y+4});
+                        Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y+4,caster:Game.player,type:Game.selected});
                         ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y+4)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                     }
                     else
@@ -847,7 +848,7 @@ function aim(spell,startx,starty)
                         Game.map.tiles[(Game.player.position.y)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y});
+                        Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y,caster:Game.player,type:Game.selected});
                         ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                     }
                     else
@@ -860,13 +861,13 @@ function aim(spell,startx,starty)
                         Game.map.tiles[(Game.player.position.y-2)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y-2});
+                        Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y-2,caster:Game.player,type:Game.selected});
                         ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y-2)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         if(Game.map.tiles[(Game.player.position.y-3)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible && //left branch accessible
                             Game.map.tiles[(Game.player.position.y-4)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
                         {
                             ctx.fillStyle = "rgba(0,150,0,0.5)";
-                            Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y-4});
+                            Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y-4,caster:Game.player,type:Game.selected});
                             ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y-4)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         }
                         else
@@ -884,13 +885,13 @@ function aim(spell,startx,starty)
                         Game.map.tiles[(Game.player.position.y+2)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y+2});
+                        Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y+2,caster:Game.player,type:Game.selected});
                         ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y+2)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         if(Game.map.tiles[(Game.player.position.y+3)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible && //left branch accessible
                             Game.map.tiles[(Game.player.position.y+4)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
                         {
                             ctx.fillStyle = "rgba(0,150,0,0.5)";
-                            Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y+4});
+                            Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y+4,caster:Game.player,type:Game.selected});
                             ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y+4)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         }
                         else
@@ -914,7 +915,7 @@ function aim(spell,startx,starty)
                         Game.map.tiles[(Game.player.position.y)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y});
+                        Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y,caster:Game.player,type:Game.selected});
                         ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                     }
                     else
@@ -926,22 +927,22 @@ function aim(spell,startx,starty)
                     if(Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible) //left branch accessible
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y-1});
+                        Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y-1,caster:Game.player,type:Game.selected});
                         ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y-1)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         if(Game.map.tiles[(Game.player.position.y-2)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
                         {
                             ctx.fillStyle = "rgba(0,150,0,0.5)";
-                            Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y-2});
+                            Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y-2,caster:Game.player,type:Game.selected});
                             ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y-2)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                             if(Game.map.tiles[(Game.player.position.y-3)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
                             {
                                 ctx.fillStyle = "rgba(0,150,0,0.5)";
-                                Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y-3});
+                                Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y-3,caster:Game.player,type:Game.selected});
                                 ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y-3)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                                 if(Game.map.tiles[(Game.player.position.y-4)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
                                 {
                                     ctx.fillStyle = "rgba(0,150,0,0.5)";
-                                    Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y-4});
+                                    Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y-4,caster:Game.player,type:Game.selected});
                                     ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y-4)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                                 }
                                 else
@@ -972,22 +973,22 @@ function aim(spell,startx,starty)
                     if(Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible) //right branch accessible
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y+1});
+                        Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y+1,caster:Game.player,type:Game.selected});
                         ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y+1)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         if(Game.map.tiles[(Game.player.position.y+2)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
                         {
                             ctx.fillStyle = "rgba(0,150,0,0.5)";
-                            Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y+2});
+                            Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y+2,caster:Game.player,type:Game.selected});
                             ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y+2)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                             if(Game.map.tiles[(Game.player.position.y+3)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
                             {
                                 ctx.fillStyle = "rgba(0,150,0,0.5)";
-                                Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y+3});
+                                Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y+3,caster:Game.player,type:Game.selected});
                                 ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y+3)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                                 if(Game.map.tiles[(Game.player.position.y+4)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
                                 {
                                     ctx.fillStyle = "rgba(0,150,0,0.5)";
-                                    Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y+4});
+                                    Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y+4,caster:Game.player,type:Game.selected});
                                     ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y+4)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                                 }
                                 else
@@ -1021,7 +1022,7 @@ function aim(spell,startx,starty)
                         Game.map.tiles[(Game.player.position.y)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x+2*yaim,y:Game.player.position.y});
+                        Game.aimed.push({x:Game.player.position.x+2*yaim,y:Game.player.position.y,caster:Game.player,type:Game.selected});
                         ctx.fillRect((Game.player.position.x+2*yaim)*Game.tilesize+startx,(Game.player.position.y)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                     }
                     else
@@ -1033,7 +1034,7 @@ function aim(spell,startx,starty)
                     if(Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x+2*yaim,y:Game.player.position.y-1});
+                        Game.aimed.push({x:Game.player.position.x+2*yaim,y:Game.player.position.y-1,caster:Game.player,type:Game.selected});
                         ctx.fillRect((Game.player.position.x+2*yaim)*Game.tilesize+startx,(Game.player.position.y-1)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                     }
                     else
@@ -1044,7 +1045,7 @@ function aim(spell,startx,starty)
                     if(Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x+2*yaim,y:Game.player.position.y+1});
+                        Game.aimed.push({x:Game.player.position.x+2*yaim,y:Game.player.position.y+1,caster:Game.player,type:Game.selected});
                         ctx.fillRect((Game.player.position.x+2*yaim)*Game.tilesize+startx,(Game.player.position.y+1)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                     }
                     else
@@ -1060,7 +1061,7 @@ function aim(spell,startx,starty)
                         Game.map.tiles[(Game.player.position.y)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x+2*yaim,y:Game.player.position.y});
+                        Game.aimed.push({x:Game.player.position.x+2*yaim,y:Game.player.position.y,caster:Game.player,type:Game.selected});
                         ctx.fillRect((Game.player.position.x+2*yaim)*Game.tilesize+startx,(Game.player.position.y)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                     }
                     else
@@ -1073,13 +1074,13 @@ function aim(spell,startx,starty)
                     if(Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible) //left branch
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x+2*yaim,y:Game.player.position.y-1});
+                        Game.aimed.push({x:Game.player.position.x+2*yaim,y:Game.player.position.y-1,caster:Game.player,type:Game.selected});
                         ctx.fillRect((Game.player.position.x+2*yaim)*Game.tilesize+startx,(Game.player.position.y-1)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         if(Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible &&
                             Game.map.tiles[(Game.player.position.y-2)*Game.map.columns+(Game.player.position.x+yaim)].accessible)
                         {
                             ctx.fillStyle = "rgba(0,150,0,0.5)";
-                            Game.aimed.push({x:Game.player.position.x+yaim,y:Game.player.position.y-2});
+                            Game.aimed.push({x:Game.player.position.x+yaim,y:Game.player.position.y-2,caster:Game.player,type:Game.selected});
                             ctx.fillRect((Game.player.position.x+yaim)*Game.tilesize+startx,(Game.player.position.y-2)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         }
                         else
@@ -1097,13 +1098,13 @@ function aim(spell,startx,starty)
                     if(Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible) //right branch
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x+2*yaim,y:Game.player.position.y+1});
+                        Game.aimed.push({x:Game.player.position.x+2*yaim,y:Game.player.position.y+1,caster:Game.player,type:Game.selected});
                         ctx.fillRect((Game.player.position.x+2*yaim)*Game.tilesize+startx,(Game.player.position.y+1)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         if(Game.map.tiles[(Game.player.position.y+2)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible &&
                             Game.map.tiles[(Game.player.position.y+2)*Game.map.columns+(Game.player.position.x+yaim)].accessible)
                         {
                             ctx.fillStyle = "rgba(0,150,0,0.5)";
-                            Game.aimed.push({x:Game.player.position.x+yaim,y:Game.player.position.y+2});
+                            Game.aimed.push({x:Game.player.position.x+yaim,y:Game.player.position.y+2,caster:Game.player,type:Game.selected});
                             ctx.fillRect((Game.player.position.x+yaim)*Game.tilesize+startx,(Game.player.position.y+2)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         }
                         else
@@ -1125,7 +1126,7 @@ function aim(spell,startx,starty)
                     if(Game.map.tiles[(Game.player.position.y)*Game.map.columns+(Game.player.position.x+yaim)].accessible)//path in front of player
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x+yaim,y:Game.player.position.y});
+                        Game.aimed.push({x:Game.player.position.x+yaim,y:Game.player.position.y,caster:Game.player,type:Game.selected});
                         ctx.fillRect((Game.player.position.x+yaim)*Game.tilesize+startx,(Game.player.position.y)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                     }
                     else
@@ -1139,14 +1140,14 @@ function aim(spell,startx,starty)
                         Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x+2*yaim,y:Game.player.position.y-1});
+                        Game.aimed.push({x:Game.player.position.x+2*yaim,y:Game.player.position.y-1,caster:Game.player,type:Game.selected});
                         ctx.fillRect((Game.player.position.x+2*yaim)*Game.tilesize+startx,(Game.player.position.y-1)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         if(Game.map.tiles[(Game.player.position.y-2)*Game.map.columns+(Game.player.position.x+yaim)].accessible &&
                             Game.map.tiles[(Game.player.position.y-2)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible &&
                             Game.map.tiles[(Game.player.position.y-2)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
                         {
                             ctx.fillStyle = "rgba(0,150,0,0.5)";
-                            Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y-2});
+                            Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y-2,caster:Game.player,type:Game.selected});
                             ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y-2)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         }
                         else
@@ -1165,14 +1166,14 @@ function aim(spell,startx,starty)
                         Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x+2*yaim,y:Game.player.position.y+1});
+                        Game.aimed.push({x:Game.player.position.x+2*yaim,y:Game.player.position.y+1,caster:Game.player,type:Game.selected});
                         ctx.fillRect((Game.player.position.x+2*yaim)*Game.tilesize+startx,(Game.player.position.y+1)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         if(Game.map.tiles[(Game.player.position.y+2)*Game.map.columns+(Game.player.position.x+yaim)].accessible &&
                             Game.map.tiles[(Game.player.position.y+2)*Game.map.columns+(Game.player.position.x+2*yaim)].accessible &&
                             Game.map.tiles[(Game.player.position.y+2)*Game.map.columns+(Game.player.position.x+3*yaim)].accessible)
                         {
                             ctx.fillStyle = "rgba(0,150,0,0.5)";
-                            Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y+2});
+                            Game.aimed.push({x:Game.player.position.x+3*yaim,y:Game.player.position.y+2,caster:Game.player,type:Game.selected});
                             ctx.fillRect((Game.player.position.x+3*yaim)*Game.tilesize+startx,(Game.player.position.y+2)*Game.tilesize+starty,Game.tilesize,Game.tilesize);
                         }
                         else
@@ -1198,7 +1199,7 @@ function aim(spell,startx,starty)
                         Game.map.tiles[(Game.player.position.y)*Game.map.columns+(Game.player.position.x+4*yaim)].accessible)
                     {
                         ctx.fillStyle = "rgba(0,150,0,0.5)";
-                        Game.aimed.push({x:Game.player.position.x+4*yaim,y:Game.player.position.y});
+                        Game.aimed.push({x:Game.player.position.x+4*yaim,y:Game.player.position.y,caster:Game.player,type:Game.selected});
                     }
                     else
                         ctx.fillStyle = "rgba(150,0,0,0.5)";
@@ -1209,11 +1210,13 @@ function aim(spell,startx,starty)
     }
 }
 
-function cast(type)
+function cast()
 {
     var current_pos;
+    var type;
     for(var i=0;i<Game.aimed.length;i++)
     {
+        type = Game.aimed[i].type;
         current_pos = Game.aimed[i].y*Game.map.columns+Game.aimed[i].x;
 
         if(type.charAt(0)=='t') //thunder spell may miss. If thunder spell this is performed only once
@@ -1222,9 +1225,9 @@ function cast(type)
 
             if(type.charAt(1)=='1') //tier 1 spell
             {
-                if(tmp < 30) //miss
+                if(tmp < 30 && !Game.skills[11]) //miss
                 {
-                    console.log("Your Spark spell missed the target");
+                    console.log(Strings.failthunder[0]+"Spark"+Strings.failthunder[1]);
                     do //generate the alterated position in case the lightning spell misses
                     {
                         offsetx = Math.random(-1,1);
@@ -1236,9 +1239,9 @@ function cast(type)
             }
             else if(type.charAt(1)=='2') //tier 2 spell
             {
-                if(tmp < 40) //miss
+                if((tmp < 40 && !Game.skills[11]) || (tmp < 6 && Game.skills[11])) //miss
                 {
-                    console.log("Your Bolt spell missed the target");
+                    console.log(Strings.failthunder[0]+"Bolt"+Strings.failthunder[1]);
                     do //generate the alterated position in case the lightning spell misses
                     {
                         offsetx = Math.random(-1,1);
@@ -1250,9 +1253,9 @@ function cast(type)
             }
             else //tier 3 spell
             {
-                if(tmp <50)//miss
+                if((tmp <50 && !Game.skills[11]) || (tmp < 11 && Game.skills[11]))//miss
                 {
-                    console.log("Your Lightning spell missed the target");
+                    console.log(Strings.failthunder[0]+"Lightning"+Strings.failthunder[1]);
                     do //generate the alterated position in case the lightning spell misses
                     {
                         offsetx = Math.random(-1,1);
@@ -1780,27 +1783,70 @@ function whichRoom(x,y)
 
 function spawnEnemies(level)
 {
+    var rooms = Game.map.rooms.concat([]); //deep copy array
+    var spliced = [];
+    spliced.push(rooms.splice(Game.player.room,1));
     switch(level)
     {
         case 1:
             {
-                var spawned = new Npc(1,1,100,FIREENEMY,80,0,0,AI);
-                Game.npcs[Game.map.columns+1] = spawned;
-                Game.enemies_left++;
+                var enemycount = 2;
                 break;
             }
+        case 2: var enemycount = 3;break;
+        case 3: var enemycount = 4;break;
+        case 4: var enemycount = 4;break;
+        case 5: var enemycount = 5;break;
+        case 6: var enemycount = Math.random(5,6);break;
+        case 7: var enemycount = Math.random(5,7);break;
+        case 8: var enemycount = Math.random(6,7);break;
+        case 9: var enemycount = Math.random(6,10);break;
+        case 10:var enemycount = 1;break;
         default: break;
     }
+    var i = 0;
+    while(i<enemycount)
+    {
+        if(rooms.length==0)
+        {
+            debug("array ended");
+            rooms = Game.map.rooms.concat([]);
+            spliced = [];
+        }
+        var selected_room = Math.random(0,rooms.length-1);
+        debug(rooms);
+        var spawnedx = Math.random(Game.map.rooms[selected_room].sx+2,Game.map.rooms[selected_room].ex-2);
+        var spawnedy = Math.random(Game.map.rooms[selected_room].sy+2,Game.map.rooms[selected_room].ey-2);
+        var spawned = new Npc(spawnedx,spawnedy,100,ENEMY,80,0,0,AI);
+        var target = spawned.position.y*Game.map.columns+spawned.position.x;
+        if(Game.map.tiles[target]!=undefined && Game.map.tiles[target].accessible && Game.npcs[target]==undefined && Game.map.tiles[target]!=HDOOR && Game.map.tiles[target]!=VDOOR)
+        {
+            debug("spawned "+spawned.position.x+" "+spawned.position.y);
+            spliced.push(rooms.splice(selected_room,1));
+            Game.npcs[spawned.position.y*Game.map.columns+spawned.position.x] = spawned;
+            Game.enemies_left++;
+            i++;
+        }
+    }
+
 }
 
 function AI(ppos) //ppos:player position
 {
+    if(this.turn == Game.turn) //avoid processing multiple times
+        return;
+    else
+        this.turn++;
     var xtarget = 0, ytarget = 4;
     var xthreshold = 1, ythreshold = 1;
     if(this.aistatus == 1)
     {
+        this.model=ENEMY;
         if(Game.player.room == this.room)
+        {
             this.aistatus = 0; //start chasing from the next turn
+            this.model=ENEMYALERT;
+        }
         else //roam around the room
         {
             var act = Math.random(1,10);
@@ -1815,10 +1861,15 @@ function AI(ppos) //ppos:player position
             var target = (this.position.y+this.wanderingDirection.y)*Game.map.columns+this.wanderingDirection.x+this.position.x;
             var tile = Game.map.tiles[target];
             if(tile!=undefined && tile.accessible && tile!=HDOOR && tile!=VDOOR && tile!= BHDOOR && tile!=BVDOOR &&
-               Game.overlay[target]==undefined && Game.objects[target]!=STAIRS && Game.objects[target]!=BSTAIRS)
+               Game.overlay[target]==undefined && Game.objects[target]!=STAIRS && Game.objects[target]!=BSTAIRS && Game.npcs[target]==undefined)
             {
-                this.position.x += this.wanderingDirection.x;
-                this.position.y += this.wanderingDirection.y;
+                if(!Game.skills[2] || Game.skills[2] && Math.random(1,10)>6)
+                {
+                    Game.npcs[target] = this;
+                    Game.npcs[this.position.y*Game.map.columns+this.position.x] = undefined;
+                    this.position.x += this.wanderingDirection.x;
+                    this.position.y += this.wanderingDirection.y;
+                }
             }
             else
                 this.wanderingDirection = undefined;
@@ -1827,7 +1878,8 @@ function AI(ppos) //ppos:player position
     else if(!this.aistatus)  //chase
     {
         if(Game.player.room != this.room)
-            this.aistatus = 2;
+            this.aistatus = 7;
+        this.model = ENEMY;
         var distancex = Math.abs(this.position.x-ppos.x);
         var distancey = Math.abs(this.position.y-ppos.y);
         var offsetx1 = Math.abs(distancex-xtarget); //decide if it is better to position on top or side of player
@@ -1886,25 +1938,28 @@ function AI(ppos) //ppos:player position
         var tile = Game.map.tiles[target];
         if(tile!=undefined && tile.accessible && tile!=HDOOR && tile!=VDOOR && tile!= BHDOOR && tile!=BVDOOR &&
            Game.overlay[target]==undefined && Game.objects[target]!=STAIRS && Game.objects[target]!=BSTAIRS &&
-            Game.Xnpcs[target]==undefined)
+            Game.npcs[target]==undefined)
         {
-            this.position.x += movex;
-            this.position.y += movey;
+            if(!Game.skills[2] || Game.skills[2] && Math.random(1,10)>6)
+            {
+                this.position.x += movex;
+                this.position.y += movey;
+                Game.npcs[target] = this;
+                Game.npcs[old_target] = undefined;
+            }
         }
 
     }
     else if(this.aistatus == 99); //lumina spell
     else //wait some turns
     {
+        this.model = ENEMYGONE;
         if(Game.player.room == this.room)
+        {
             this.aistatus = 0;
+            this.model = ENEMYALERT;
+        }
         else
             this.aistatus--;
     }
-    Game.Xnpcs[this.position.y*Game.map.columns+this.position.x] = this;
-}
-
-function cast_enemy(spell,target)
-{
-
 }

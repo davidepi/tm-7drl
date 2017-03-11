@@ -12,11 +12,11 @@ var Strings =
             //"Do you remember when you tried to burn that ant with the magnifying glass and managed to set on fire the entire forest?
             "Do you remember when you tried to lit the candle with magic and burned your hands? The fire started spreading everywhere and you were not able to control it. No, you don't want to repeat that experience. For this reason you are now able to turn the floor to ash where you are walking, somehow preventing a bit the fire from spreading.",
             "You don't understand your full power... But you feel strange, you feel you don't fear fire anymore",
-            "You don't understand your full power... But you know you are better with a particular type of spell, and your power... You feel your power growing...",
+            "You don't understand your full power... But you know you see a mastodontic power...",
             "You don't understand your full power... But you feel lighter, and your legs start moving faster...",
             "You don't understand your full power... But you have a better eye and a better sight... Your aim is no longer like before...",
             "What?!?? A Vampire?",
-            "Lumina? Is it something to eat?",
+            "Revolution? What year is it?",
             "A ghost? Where? You fears ghosts!",
             "Drones? What are they?",
             "This power is beyond your imagination",
@@ -27,6 +27,8 @@ var Strings =
         endfloor:"You terribly want to escape, but by doing that they will chase you! No, it is better if you first defeat every enemy wizard in this floor",
         shard:"You collect a twinkling magical stone and feel your power growing, but you sacrifice part of your life",
         completefloor:["You completed a floor and your power starts growing. You gained "," HP"],
+        fireplayer: ["Ouch! You walked on the fire and lost "," HP, pay attention!"],
+        failthunder: ["Your aim with the "," spell is not very good and you missed the target"],
     }
 
 function stringSwap1()
