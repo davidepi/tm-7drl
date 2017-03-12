@@ -35,12 +35,8 @@ render();
 
 function endTurn()
 {
+    Game.aimed = [];
     document.getElementById("turn").innerHTML = ++Game.turn;
-    Game.npcs.forEach(function(cur, index, arr)
-        {
-            if(cur!=undefined)
-                cur.act(Game.oldpos);
-        });
     Game.overlay.map(propagate);
     Game.overlay=[];
     Game.overlay=Game.Xoverlay;
@@ -52,15 +48,59 @@ function endTurn()
             Game.player.curhp-=remove;
             console.log(Strings.fireplayer[0]+remove+Strings.fireplayer[1]);
         }
+    Game.npcs.forEach(function(cur, index, arr)
+        {
+            if(cur!=undefined)
+                cur.act(Game.oldpos);
+        });
+    cast();
     document.getElementById("hp").innerHTML = Game.player.curhp+"/"+Game.player.maxhp;
     document.getElementById("fr").innerHTML = Game.player.fp+"%";
     document.getElementById("ic").innerHTML = Game.player.ip+"%";
     document.getElementById("th").innerHTML = Game.player.tp+"%";
     if(Game.player.curhp<1)
     {
-        console.log("You diededed!!!")
-        return false;
+        if(Game.skills[16]==1)
+            Game.skills[16]=2;
+        else
+        {
+            console.log("You diededed!!!")
+            document.getElementById("mesg").style.display="block";
+            document.getElementById("introbg").style.display="block";
+            document.getElementById("mesg").innerHTML="<h1>You Died</h1><div>Refresh the page to retry</div>";
+            return false;
+        }
     }
+    Game.npcs.forEach(function(cur,index,arr)
+        {
+         if(cur!=undefined && Game.overlay[index]!=undefined && Game.overlay[index].value==0)
+        {
+            var remove = Math.floor(Math.random(0,(10*Game.level)+1)*Game.firemultiplier+1);
+            cur.curhp-=remove;
+             debug("enemy lost health");
+        }
+            if(cur!=undefined && (cur.curhp<1||(Game.skills[17] && cur.curhp<(Math.floor(cur.maxhp/10)))))
+        {   
+                Game.npcs[index] = undefined;
+                Game.enemies_left--;
+                console.log(Strings.enemydies[0]+cur.name+Strings.enemydies[1]);
+                if(Game.objects[index] == undefined)
+                {
+                    if(Math.random(0,1)==0)
+                        Game.objects[index] = HEART;
+                    else 
+                    {
+                        switch(Math.random(0,2))
+                        {
+                            case 0:Game.objects[index] = FIRESHARD;break;
+                            case 1:Game.objects[index] = ICESHARD;break;
+                            case 2:Game.objects[index] = THUNDERSHARD;break;
+                        }
+                    }
+                }
+        }
+        
+        });
     Game.oldpos = Game.player.position;
     return true;
 }
@@ -100,7 +140,7 @@ function generateMap(magnitude)
         case 4:
             {
                 Game.player.model=new Tile(false,128,0);
-                stringSwap1();
+                //stringSwap1();
                 generateBase(30,40,30,40,4);
                 document.getElementById("title").innerHTML = 'Fourth Floor';
                 break;
@@ -126,7 +166,7 @@ function generateMap(magnitude)
                 generateBase(45,55,45,55,5);
                 enableSkills(7);
                 document.getElementById("title").innerHTML = 'Seventh Floor';
-                stringSwap2();
+                //stringSwap2();
                 break;
             }
         case 8:
@@ -157,7 +197,10 @@ function generateMap(magnitude)
                 generateBase(8,8,8,8,0);
                 Game.objects = [];
                 break;
-                //endgame;
+                document.getElementById("mesg").style.display="block";
+                document.getElementById("introbg").style.display="block";
+                document.getElementById("mesg").innerHTML="<h1>Congratuliations</h1><div>You finished the game</div>";
+                Game.kstatus = Status.DEAD;
             }
         default:
             {
@@ -224,7 +267,7 @@ function increaseFire()
     {
         Game.player.ip = Game.player.ip>2?Game.player.ip-2:0;
         Game.player.tp = Game.player.tp>2?Game.player.tp-2:0;
-        Game.player.fp +=(7+Math.random(0,5));
+        Game.player.fp +=(Math.random(10,20)+Math.random(0,5));
         if(Game.player.fp > 300 && !Game.skills[1])
             Game.player.fp = 300;
         newvalue = Game.player.fp;
@@ -272,7 +315,7 @@ function increaseIce()
     {
         Game.player.fp = Game.player.fp>2?Game.player.fp-2:0;
         Game.player.tp = Game.player.tp>2?Game.player.tp-2:0;
-        Game.player.ip +=(7+Math.random(0,5));
+        Game.player.ip +=(Math.random(10,20)+Math.random(0,5));
         if(Game.player.ip > 300 && !Game.skills[1])
             Game.player.ip = 300;
         newvalue = Game.player.ip;
@@ -321,7 +364,7 @@ function increaseThunder()
     {
         Game.player.ip = Game.player.ip>2?Game.player.ip-2:0;
         Game.player.fp = Game.player.fp>2?Game.player.fp-2:0;
-        Game.player.tp +=7+Math.random(0,5);
+        Game.player.tp +=(Math.random(10,20)+Math.random(0,5));
         if(Game.player.tp>300 && !Game.skills[1])
             Game.player.tp = 300;
         newvalue = Game.player.tp;
@@ -353,9 +396,10 @@ function increaseThunder()
 function increaseHealth()
 {
     Game.player.curhp += 50;
-    if(Game.player.curhp == Game.player.maxhp)
+    console.log(Strings.health);
+    if(Game.player.curhp >= Game.player.maxhp)
         Game.player.curhp = Game.player.maxhp;
-    Game.objects[Game.player.position*y*Game.map.columns+Game.player.position.x] = undefined;
+    Game.objects[Game.player.position.y*Game.map.columns+Game.player.position.x] = undefined;
 }
 
 function aim(spell,startx,starty)
@@ -1214,10 +1258,12 @@ function cast()
 {
     var current_pos;
     var type;
+    var casterPlayer;
     for(var i=0;i<Game.aimed.length;i++)
     {
         type = Game.aimed[i].type;
         current_pos = Game.aimed[i].y*Game.map.columns+Game.aimed[i].x;
+        casterPlayer = Game.aimed[i].caster==Game.player?true:false;
 
         if(type.charAt(0)=='t') //thunder spell may miss. If thunder spell this is performed only once
         {
@@ -1227,7 +1273,11 @@ function cast()
             {
                 if(tmp < 30 && !Game.skills[11]) //miss
                 {
-                    console.log(Strings.failthunder[0]+"Spark"+Strings.failthunder[1]);
+                    if(casterPlayer)
+                        console.log(Strings.failthunder[0]+"Spark"+Strings.failthunder[1]);
+                    else
+                        console.log(Strings.failthunderEnemy[0]+"Spark"+Strings.failthunderEnemy[1]);
+
                     do //generate the alterated position in case the lightning spell misses
                     {
                         offsetx = Math.random(-1,1);
@@ -1241,7 +1291,11 @@ function cast()
             {
                 if((tmp < 40 && !Game.skills[11]) || (tmp < 6 && Game.skills[11])) //miss
                 {
-                    console.log(Strings.failthunder[0]+"Bolt"+Strings.failthunder[1]);
+                    if(casterPlayer)
+                        console.log(Strings.failthunder[0]+"Bolt"+Strings.failthunder[1]);
+                    else
+                        console.log(Strings.failthunderEnemy[0]+"Bolt"+Strings.failthunderEnemy[1]);
+
                     do //generate the alterated position in case the lightning spell misses
                     {
                         offsetx = Math.random(-1,1);
@@ -1255,7 +1309,11 @@ function cast()
             {
                 if((tmp <50 && !Game.skills[11]) || (tmp < 11 && Game.skills[11]))//miss
                 {
-                    console.log(Strings.failthunder[0]+"Lightning"+Strings.failthunder[1]);
+                    if(casterPlayer)
+                        console.log(Strings.failthunder[0]+"Lightning"+Strings.failthunder[1]);
+                    else
+                        console.log(Strings.failthunderEnemy[0]+"Lightning"+Strings.failthunderEnemy[1]);
+
                     do //generate the alterated position in case the lightning spell misses
                     {
                         offsetx = Math.random(-1,1);
@@ -1268,10 +1326,40 @@ function cast()
         }
 
         //destroy objects on hit
+        /* EDIT: don't destroy, there would be too much flames and objects will always be destroyed
         if(Game.objects[current_pos]!=undefined && Game.objects[current_pos]!=STAIRS && Game.objects[current_pos]!=BSTAIRS)
             Game.objects[current_pos]=undefined;
+        */
 
-        //TODO check if enemies and add damage
+        //DAMAGE
+        var intensity = type.charAt(0)=="f"?0.8*Game.aimed[i].caster.fp*Game.firemultiplier:type.charAt(0)=="t"?Game.aimed[i].caster.tp*Game.thundermultiplier:Game.aimed[i].caster.ip*0.9*Game.icemultiplier;
+        var multiplier1 = type.charAt(2)==1?1:type.charAt(2)==2?1.17:1.35;
+        var multiplier2 = Math.random(50,100)/100;
+        var damage = Math.floor(intensity*multiplier1*multiplier2);
+        if(Game.npcs[current_pos]!=undefined)
+        { 
+            Game.npcs[current_pos].curhp-=damage;
+            if(Game.aimed[i].caster == Game.player)
+            {
+                if(Game.skills[12])
+                {
+                    Game.player.curhp+=Math.floor(damage/10);
+                    if(Game.player.curhp>Game.player.maxhp)
+                        Game.player.curhp=Game.player.maxhp;
+                }
+                console.log(Strings.playerenemy[0]+Game.npcs[current_pos].name+Strings.playerenemy[1]+damage+Strings.playerenemy[2]);
+            }
+            else
+                console.log(Strings.enemyenemy[0]+Game.aimed[i].caster.name+Strings.enemyenemy[1]+Game.npcs[current_pos].name+Strings.enemyenemy[2]+damage+Strings.enemyenemy[3]);
+        }
+        if(Game.player.position.x+Game.player.position.y*Game.map.columns==current_pos)
+        {
+            if(!Game.skills[4] || (Game.skills[4] && Math.random(15,100)<85))
+            {
+                Game.player.curhp -= damage;
+                console.log(Strings.enemyplayer[0]+Game.aimed[i].caster.name+Strings.enemyplayer[1]+damage+Strings.enemyplayer[2]);
+            }
+        }
 
         switch(type.charAt(0))
         {
@@ -1296,6 +1384,8 @@ function cast()
                 }
             case 'g':
                 {
+                    if(Game.npcs[current_pos]!=undefined)
+                        break;
                     if(Game.overlay[current_pos]==undefined)
                         Game.overlay[current_pos] = new Effect(ICE,101,1);
                     else
@@ -1396,8 +1486,11 @@ function propagate(item,index)
                             Game.Xoverlay[new_index] = new Effect(FIRE,10,0);
                         else
                             Game.Xoverlay[new_index] = new Effect(FIRE,3,0);
+                        /*
+                         * dont' destroy
                         if(Game.objects[new_index]!=undefined && Game.objects[new_index]!=STAIRS && Game.objects[new_index]!=BSTAIRS)
                             Game.objects[new_index]=undefined;
+                            */
                     }
                 }
                 else if(Game.overlay[new_index].type==1)
@@ -1786,22 +1879,19 @@ function spawnEnemies(level)
     var rooms = Game.map.rooms.concat([]); //deep copy array
     var spliced = [];
     spliced.push(rooms.splice(Game.player.room,1));
+    var enemycount,minpower,maxpower,minhp,maxhp;
     switch(level)
     {
-        case 1:
-            {
-                var enemycount = 2;
-                break;
-            }
-        case 2: var enemycount = 3;break;
-        case 3: var enemycount = 4;break;
-        case 4: var enemycount = 4;break;
-        case 5: var enemycount = 5;break;
-        case 6: var enemycount = Math.random(5,6);break;
-        case 7: var enemycount = Math.random(5,7);break;
-        case 8: var enemycount = Math.random(6,7);break;
-        case 9: var enemycount = Math.random(6,10);break;
-        case 10:var enemycount = 1;break;
+        case 1: enemycount = 2;minpower = 10;maxpower = 30;minhp = 80; maxhp=120;break;
+        case 2: enemycount = 3;minpower = 30;maxpower = 50;minhp = 180; maxhp = 250;break;
+        case 3: enemycount = 4;minpower = 50;maxpower = 99;minhp = 220; maxhp=320;break;
+        case 4: enemycount = 4;minpower = 70;maxpower = 120; minhp = 380; maxhp = 420;break;
+        case 5: enemycount = 5;minpower = 80;maxpower = 199; minhp = 480; maxhp = 520;break;
+        case 6: enemycount = Math.random(5,6);minpower = 120; minhp = 580; maxhp = 620; maxpower = 199;break;
+        case 7: enemycount = Math.random(5,7);minpower = 150; maxpower = 220; minhp = 650; maxhp = 750;break;
+        case 8: enemycount = Math.random(6,7);minpower = 190; maxpower = 270; minhp = 700; maxhp = 820;break;
+        case 9: enemycount = Math.random(6,10);minpower = 230; maxpower = 300;minhp = 750; maxhp = 920;break;
+        case 10:enemycount = 1;minpower = 290;maxpower = 300;minhp = 1000; maxhp = 1500;break;
         default: break;
     }
     var i = 0;
@@ -1809,36 +1899,47 @@ function spawnEnemies(level)
     {
         if(rooms.length==0)
         {
-            debug("array ended");
             rooms = Game.map.rooms.concat([]);
             spliced = [];
         }
         var selected_room = Math.random(0,rooms.length-1);
-        debug(rooms);
-        var spawnedx = Math.random(Game.map.rooms[selected_room].sx+2,Game.map.rooms[selected_room].ex-2);
-        var spawnedy = Math.random(Game.map.rooms[selected_room].sy+2,Game.map.rooms[selected_room].ey-2);
-        var spawned = new Npc(spawnedx,spawnedy,100,ENEMY,80,0,0,AI);
+        var spawnedx = Math.random(rooms[selected_room].sx+2,rooms[selected_room].ex-2);
+        var spawnedy = Math.random(rooms[selected_room].sy+2,rooms[selected_room].ey-2);
+        var spawned = new Npc(i+Math.random(0,500),spawnedx,spawnedy,Math.random(minhp,maxhp),ENEMY,Math.random(0,1),Math.random(minpower,maxpower),Math.random(minpower,maxpower),AI);
         var target = spawned.position.y*Game.map.columns+spawned.position.x;
         if(Game.map.tiles[target]!=undefined && Game.map.tiles[target].accessible && Game.npcs[target]==undefined && Game.map.tiles[target]!=HDOOR && Game.map.tiles[target]!=VDOOR)
         {
-            debug("spawned "+spawned.position.x+" "+spawned.position.y);
-            spliced.push(rooms.splice(selected_room,1));
+            if(level<3)
+                spliced.push(rooms.splice(selected_room,1));
             Game.npcs[spawned.position.y*Game.map.columns+spawned.position.x] = spawned;
             Game.enemies_left++;
             i++;
         }
     }
-
 }
 
 function AI(ppos) //ppos:player position
 {
+
     if(this.turn == Game.turn) //avoid processing multiple times
         return;
     else
         this.turn++;
-    var xtarget = 0, ytarget = 4;
-    var xthreshold = 1, ythreshold = 1;
+    var xtarget,ytarget,xthreshold,ythreshold;
+    if(this.spell.charAt(0)=='t')
+    {
+        xtarget = 0;
+        ytarget = 4;
+        xthreshold = 1;
+        ythreshold = 1;
+    }
+    else
+    {
+        xtarget = 0;
+        ytarget = 3;
+        xthreshold = 3;
+        ythreshold = 0;
+    }
     if(this.aistatus == 1)
     {
         this.model=ENEMY;
@@ -1879,68 +1980,82 @@ function AI(ppos) //ppos:player position
     {
         if(Game.player.room != this.room)
             this.aistatus = 7;
-        this.model = ENEMY;
-        var distancex = Math.abs(this.position.x-ppos.x);
-        var distancey = Math.abs(this.position.y-ppos.y);
-        var offsetx1 = Math.abs(distancex-xtarget); //decide if it is better to position on top or side of player
-        var offsetx2 = Math.abs(distancex-ytarget);
-        var offsety1 = Math.abs(distancey-ytarget);
-        var offsety2 = Math.abs(distancey-xtarget);
-        var movex = 0, movey = 0;
-        
-        if(offsetx1+offsety1 < offsetx2+offsety2) //align top or bottom
-        {   
-            if((!offsetx1 && !offsety1 && Math.random(1,10)<10) ||
-                (offsetx1 <= xthreshold && offsety1 <= ythreshold && Math.random(1,10)<4)) //90% casting chance when player was in range || 30% random cast when below threshold
-            {
-                debug("cast");
-            }
-            else if(offsetx1 > offsety1) //align on x
-            {
-                if((this.position.x-ppos.x)>0) //right of the alignment poin
-                    movex=distancex-xtarget>0?-1:1;  //if positive I'm too far else I'm too near
-                else
-                    movex=distancex-xtarget>0?1:-1;
-            }
-            else if(offsety1 > offsetx1)
-            {
-                if((this.position.y-ppos.y)>0) //below player
-                    movey=distancey-ytarget>0?-1:1;
-                else
-                    movey=distancey-ytarget>0?1:-1; 
-            }
-        }
-        else //align on left or right
+        var movex = 0;
+        var movey = 0;
+        if(this.escapeDirection.escaping > 0)
         {
-            if((!offsetx2 && !offsety2 && Math.random(1,10)<10) ||
-                (offsetx2 <= ythreshold && offsety2 <= xthreshold && Math.random(1,10)<4)) //90% casting chance when player was in range || 30% random cast when below threshold
+            var old_target = this.position.y*Game.map.columns+this.position.x;
+            var target = (this.position.y+this.escapeDirection.y)*Game.map.columns+this.position.x+this.escapeDirection.x;
+            if(Game.map.tiles[target] != undefined && Game.map.tiles[target].accessible && Game.npcs[target]==undefined)
             {
-                debug("cast");
+                movex = this.escapeDirection.x;
+                movey = this.escapeDirection.y;
             }
+            else
+                this.escapeDirection.escaping = 0;
+        }
+        if(this.escapeDirection.escaping == 0)
+        {
+            this.model = ENEMY;
+            var distancex = Math.abs(this.position.x-ppos.x);
+            var distancey = Math.abs(this.position.y-ppos.y);
+            var offsetx1 = Math.abs(distancex-xtarget); //decide if it is better to position on top or side of player
+            var offsetx2 = Math.abs(distancex-ytarget);
+            var offsety1 = Math.abs(distancey-ytarget);
+            var offsety2 = Math.abs(distancey-xtarget);
+            var casted = false;
+            if(offsetx1+offsety1 < offsetx2+offsety2) //align top or bottom
+            {   
+                if((!offsetx1 && !offsety1 && Math.random(1,10)<10) ||
+                    (offsetx1 <= xthreshold && offsety1 <= ythreshold && Math.random(1,10)<4)) //90% casting chance when player was in range || 30% random cast when below threshold
+                    casted = cast_enemy(this.position,this.spell,false,this);
+                if(!casted && offsetx1 > offsety1) //align on x
+                {
+                    if((this.position.x-ppos.x)>0) //right of the alignment poin
+                        movex=distancex-xtarget>0?-1:1;  //if positive I'm too far else I'm too near
+                    else
+                        movex=distancex-xtarget>0?1:-1;
+                }
+                else if(!casted && offsety1 > offsetx1)
+                {
+                    if((this.position.y-ppos.y)>0) //below player
+                        movey=distancey-ytarget>0?-1:1;
+                    else
+                        movey=distancey-ytarget>0?1:-1; 
+                }
+            }
+            else //align on left or right
+            {
+                if((!offsetx2 && !offsety2 && Math.random(1,10)<10) ||
+                    (offsetx2 <= ythreshold && offsety2 <= xthreshold && Math.random(1,10)<4)) //90% casting chance when player was in range || 30% random cast when below threshold
+                    casted = cast_enemy(this.position,this.spell,true,this);
 
-            else if(offsetx2 > offsety2) //align on x
-            {
-                if((this.position.x-ppos.x)>0) //right of the alignment poin
-                    movex=distancex-ytarget>0?-1:1;  //if positive I'm too far else I'm too near
-                else
-                    movex=distancex-ytarget>0?1:-1;
-            }
-            else if(offsety2 > offsetx2)
-            {
-                if((this.position.y-ppos.y)>0) //below player
-                    movey=distancey-xtarget>0?-1:1;
-                else
-                    movey=distancey-xtarget>0?1:-1; 
+                if(!casted && offsetx2 > offsety2) //align on x
+                {
+                    if((this.position.x-ppos.x)>0) //right of the alignment poin
+                        movex=distancex-ytarget>0?-1:1;  //if positive I'm too far else I'm too near
+                    else
+                        movex=distancex-ytarget>0?1:-1;
+                }
+                else if(!casted && offsety2 > offsetx2)
+                {
+                    if((this.position.y-ppos.y)>0) //below player
+                        movey=distancey-xtarget>0?-1:1;
+                    else
+                        movey=distancey-xtarget>0?1:-1; 
+                }
             }
         }
         var target = (this.position.y+movey)*Game.map.columns+movex+this.position.x;
         var old_target = this.position.y*Game.map.columns+this.position.x;
         var tile = Game.map.tiles[target];
         if(tile!=undefined && tile.accessible && tile!=HDOOR && tile!=VDOOR && tile!= BHDOOR && tile!=BVDOOR &&
-           Game.overlay[target]==undefined && Game.objects[target]!=STAIRS && Game.objects[target]!=BSTAIRS &&
-            Game.npcs[target]==undefined)
+            //don't run on ice or fire, or run on fire with small chance or run on fire if already on fire
+           (Game.overlay[target]==undefined || (Game.overlay[target].type==0 && (Math.random(1,10)<1 || (Game.overlay[old_target]!=undefined && Game.overlay[old_target].type==0)))) && 
+           Game.objects[target]!=STAIRS && Game.objects[target]!=BSTAIRS && Game.npcs[target]==undefined &&
+           (this.position.x+movex != Game.player.position.x && this.position.y+movey != Game.player.position.y))
         {
-            if(!Game.skills[2] || Game.skills[2] && Math.random(1,10)>6)
+            if(!Game.skills[2] || (Game.skills[2] && Math.random(1,10)>6))
             {
                 this.position.x += movex;
                 this.position.y += movey;
@@ -1948,7 +2063,28 @@ function AI(ppos) //ppos:player position
                 Game.npcs[old_target] = undefined;
             }
         }
-
+        else
+        {
+            if(Math.random(1,10)>7 || (Math.random(1,10)==1 && this.aitype == 2))
+            {
+                if(movex)
+                {
+                    this.escapeDirection.escaping = 3;
+                    this.escapeDirection.x = 0;
+                    this.escapeDirection.y = Math.random(0,1)?-1:1;
+                }
+                else
+                {
+                    this.escapeDirection.escaping = 3;
+                    this.escapeDirection.x = Math.random(0,1)?-1:1;
+                    this.escapeDirection.y = 0;
+                }
+            }
+            else if(this.aitype == 1)
+            {
+                cast_enemy(this.position,this.spell,Math.random(0,1),this);
+            }
+        }
     }
     else if(this.aistatus == 99); //lumina spell
     else //wait some turns
@@ -1962,4 +2098,144 @@ function AI(ppos) //ppos:player position
         else
             this.aistatus--;
     }
+}
+
+function cast_enemy(position,magic,side,enemy)
+{
+    if(Game.skills[19] && (Math.random(1,100)<15))
+    {
+        console.log("The enemy was so scared of you that he managed to hit himself with the spell");
+        Game.aimed.push({x:position.x,y:position.y,caster:enemy,type:magic});
+    }
+    if(!side)
+    {
+        var isTop = Game.player.position.y < position.y?1:-1;
+        switch(magic.charAt(0))
+        {
+            case "f":
+                {
+                    var target1 = (position.y-1*isTop)*Game.map.columns+position.x;
+                    var target2 = (position.y-2*isTop)*Game.map.columns+position.x;
+                    var target3 = (position.y-3*isTop)*Game.map.columns+position.x;
+                    if(Game.map.tiles[target1] != undefined && Game.map.tiles[target1].accessible &&
+                        Game.map.tiles[target2] != undefined && Game.map.tiles[target2].accessible &&
+                        Game.map.tiles[target3] != undefined && Game.map.tiles[target3].accessible)
+                    {
+                        Game.aimed.push({x:position.x,y:position.y-3*isTop,caster:enemy,type:magic});
+                        if(Game.map.tiles[(position.y-3*isTop)*Game.map.columns+position.x+1] != undefined &&
+                           Game.map.tiles[(position.y-3*isTop)*Game.map.columns+position.x+1].accessible &&
+                           Game.map.tiles[(position.y-3*isTop)*Game.map.columns+position.x+2] != undefined &&
+                           Game.map.tiles[(position.y-3*isTop)*Game.map.columns+position.x+2].accessible)
+                        Game.aimed.push({x:position.x+2,y:position.y-3*isTop,caster:enemy,type:magic});
+                        if(Game.map.tiles[(position.y-3*isTop)*Game.map.columns+position.x-1] != undefined &&
+                           Game.map.tiles[(position.y-3*isTop)*Game.map.columns+position.x-1].accessible &&
+                           Game.map.tiles[(position.y-3*isTop)*Game.map.columns+position.x-2] != undefined &&
+                           Game.map.tiles[(position.y-3*isTop)*Game.map.columns+position.x-2].accessible)
+                        Game.aimed.push({x:position.x-2,y:position.y-3*isTop,caster:enemy,type:magic});
+                        return true;
+                    }
+                    break;
+                }
+            case "g":
+                {
+                    var target1 = (position.y-1*isTop)*Game.map.columns+position.x;
+                    var target2 = (position.y-2*isTop)*Game.map.columns+position.x;
+                    if(Game.map.tiles[target1] != undefined && Game.map.tiles[target1].accessible &&
+                        Game.map.tiles[target2] != undefined && Game.map.tiles[target2].accessible)
+                    {
+                        Game.aimed.push({x:position.x,y:position.y-2*isTop,caster:enemy,type:magic});
+                        if(Game.map.tiles[(position.y-2*isTop)*Game.map.columns+position.x-1] != undefined &&
+                            Game.map.tiles[(position.y-2*isTop)*Game.map.columns+position.x-1].accessible)
+                        Game.aimed.push({x:position.x-1,y:position.y-2*isTop,caster:enemy,type:magic});
+                        if(Game.map.tiles[(position.y-2*isTop)*Game.map.columns+position.x+1] != undefined &&
+                            Game.map.tiles[(position.y-2*isTop)*Game.map.columns+position.x+1].accessible)
+                        Game.aimed.push({x:position.x+1,y:position.y-2*isTop,caster:enemy,type:magic});
+                        return true;    
+                    }
+                }
+            case "t":
+                {
+                    var target4 = (position.y-4*isTop)*Game.map.columns+position.x;
+                    var target3 = (position.y-3*isTop)*Game.map.columns+position.x;
+                    var target2 = (position.y-2*isTop)*Game.map.columns+position.x;
+                    var target1 = (position.y-1*isTop)*Game.map.columns+position.x;
+
+                    if(Game.map.tiles[target1] != undefined && Game.map.tiles[target1].accessible &&
+                        Game.map.tiles[target2] != undefined && Game.map.tiles[target2].accessible &&
+                        Game.map.tiles[target3] != undefined && Game.map.tiles[target3].accessible &&
+                        Game.map.tiles[target4] != undefined && Game.map.tiles[target4].accessible)
+                    {
+                        Game.aimed.push({x:position.x,y:position.y-4*isTop,caster:enemy,type:magic});
+                        return true;
+                    }
+                    break;
+                }
+        }
+    }
+    else
+    {
+        var isLeft = Game.player.position.x < position.x?1:-1;
+        switch(magic.charAt(0))
+        {
+            case "f":
+                {
+                    var target1 = position.y*Game.map.columns+position.x-1*isLeft;
+                    var target2 = position.y*Game.map.columns+position.x-2*isLeft;
+                    var target3 = position.y*Game.map.columns+position.x-3*isLeft;
+                    if(Game.map.tiles[target1] != undefined && Game.map.tiles[target1].accessible &&
+                        Game.map.tiles[target2] != undefined && Game.map.tiles[target2].accessible &&
+                        Game.map.tiles[target3] != undefined && Game.map.tiles[target3].accessible)
+                    {
+                        Game.aimed.push({x:position.x-3*isLeft,y:position.y,caster:enemy,type:magic});
+                        if(Game.map.tiles[(position.y+1)*Game.map.columns+position.x-3*isLeft] != undefined &&
+                           Game.map.tiles[(position.y+1)*Game.map.columns+position.x-3*isLeft].accessible &&
+                           Game.map.tiles[(position.y+2)*Game.map.columns+position.x-3*isLeft] != undefined &&
+                           Game.map.tiles[(position.y+2)*Game.map.columns+position.x-3*isLeft].accessible)
+                        Game.aimed.push({x:position.x-3*isLeft,y:position.y+2,caster:enemy,type:magic});
+                        if(Game.map.tiles[(position.y-1)*Game.map.columns+position.x-3*isLeft] != undefined &&
+                           Game.map.tiles[(position.y-1)*Game.map.columns+position.x-3*isLeft].accessible &&
+                           Game.map.tiles[(position.y-2)*Game.map.columns+position.x-3*isLeft] != undefined &&
+                           Game.map.tiles[(position.y-2)*Game.map.columns+position.x-3*isLeft].accessible)
+                        Game.aimed.push({x:position.x-3*isLeft,y:position.y-2,caster:enemy,type:magic});
+                        return true;
+                    }
+                    break;
+                }
+            case "g":
+                {
+                    var target1 = position.y*Game.map.columns+position.x-1*isLeft;
+                    var target2 = position.y*Game.map.columns+position.x-2*isLeft;
+                    if(Game.map.tiles[target1] != undefined && Game.map.tiles[target1].accessible &&
+                        Game.map.tiles[target2] != undefined && Game.map.tiles[target2].accessible)
+                    {
+                        Game.aimed.push({x:position.x-2*isLeft,y:position.y,caster:enemy,type:magic});
+                        if(Game.map.tiles[(position.y+1)*Game.map.columns+position.x-2*isLeft] != undefined &&
+                            Game.map.tiles[(position.y+1)*Game.map.columns+position.x-2*isLeft].accessible)
+                        Game.aimed.push({x:position.x-2*isLeft,y:position.y+1,caster:enemy,type:magic});
+                        if(Game.map.tiles[(position.y-1)*Game.map.columns+position.x-2*isLeft] != undefined &&
+                            Game.map.tiles[(position.y-1)*Game.map.columns+position.x-2*isLeft].accessible)
+                        Game.aimed.push({x:position.x-2*isLeft,y:position.y-1,caster:enemy,type:magic});
+                        return true;    
+                    }
+                    break;
+                }
+            case "t":
+                {
+                    var target4 = position.y*Game.map.columns+position.x-4*isLeft;
+                    var target3 = position.y*Game.map.columns+position.x-3*isLeft;
+                    var target2 = position.y*Game.map.columns+position.x-2*isLeft;
+                    var target1 = position.y*Game.map.columns+position.x-1*isLeft;
+                    if(Game.map.tiles[target1] != undefined && Game.map.tiles[target1].accessible &&
+                        Game.map.tiles[target2] != undefined && Game.map.tiles[target2].accessible &&
+                        Game.map.tiles[target3] != undefined && Game.map.tiles[target3].accessible &&
+                        Game.map.tiles[target4] != undefined && Game.map.tiles[target4].accessible)
+                    {
+                        Game.aimed.push({x:position.x-4*isLeft,y:position.y,caster:enemy,type:magic});
+                        return true;
+                    }
+                    break;
+                }
+        }
+    }
+    return false;
 }

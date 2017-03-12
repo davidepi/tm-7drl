@@ -29,8 +29,15 @@ var Strings =
         completefloor:["You completed a floor and your power starts growing. You gained "," HP"],
         fireplayer: ["Ouch! You walked on the fire and lost "," HP, pay attention!"],
         failthunder: ["Your aim with the "," spell is not very good and you missed the target"],
+        failthunderEnemy: ["Luckily, the enemey tried a "," spell, but he missed the designated target"],
+        playerenemy: ["You hits the Enemy "," for "," damage and feel sorry for him"],
+        enemyenemy: ["Enemy "," hits Enemy ", " for "," damage. They surely want to kill you with any measure"],
+        enemyplayer: ["Enemy "," hits you for "," damage. It hurts, and you are regretting your decision to come here"],
+        enemydies:["Enemy "," fainted"],
+        health:"You gained 50HP by collecting a magical artifact dropped by the enemy",
     }
 
+/*
 function stringSwap1()
 {
     Strings =
@@ -41,12 +48,37 @@ function stringSwap1()
                 "They say \"Knowledge is power\" but you know that without action, knowledge is useless. Therefore you studied long and trained long on inanimate objects or living creatures. You are now able to increase your magic power over the limit of 300%",
                 "You suddendly have a fantastic idea to escape the tower! You can tackle every enemy and break their knee and... Oh wait! They are so old they're already turning into dust, maybe all this violence is not necessary. Enemeies have a lower chance of moving",
                 "The idea of a multiverse is not really comfortable. You put a great effort in mastering a spell just to discover that it is very weak in this world but super strong in another one. No, this is not fair. You decide to use all your powers to align the power of the spells",
+                "Before entering the tower you found an elf named Lyithion. She saw you and your ambitions, and from the depth of her soul she gave you a very powerful spell. With this spell, called the Shield of Glyncaryn, you have a chance of absorbing the enemy attack",
+                "Despite your knowledge of magic, sometimes you are able to hit the enemy, sometimes you fail miserably. For this reason you try to focus more and damge the maximum number of foes you can. Now everytime you hit an enemy everyone nearby him (except you, obviously) will suffer a portion of damage",
+                "An iceberg is blocking your only chance of escaping? You can not let this happen so, filled with determination, you instantly learn how to climb ice",
+                //"Do you remember when you tried to burn that ant with the magnifying glass and managed to set on fire the entire forest?
+                "Do you remember when you tried to lit the candle with magic and burned your hands? The fire started spreading everywhere and you were not able to control it. No, you don't want to repeat that experience. For this reason you are now able to turn the floor to ash where you are walking, somehow preventing a bit the fire from spreading.",
+                "You don't understand your full power... But you feel strange, you feel you don't fear fire anymore",
+                "You don't understand your full power... But you see a mastodontic power...",
+                "You don't understand your full power... But you feel lighter, and your legs start moving faster...",
+                "You don't understand your full power... But you have a better eye and a better sight... Your aim is no longer like before...",
+                "What?!?? A Vampire?",
+                "Revolution? What year is it?",
+                "A ghost? Where? You fears ghosts!",
+                "Drones? What are they?",
+                "This power is beyond your imagination",
+                "This power is beyond your imagination",
+                "This power is beyond your imagination",
+                "This power is beyond your imagination"
             ],
             endfloor:"You have to kill every enemy mage before continuing",
             shard:"Conscious of the fact that every magic crystal consumes part of your life you collect one, because you need to be powerful in order to escape the tower",
             completefloor:["You completed a floor and magic is growing in you. Usually this would shrink your life, but instead you gained "," HP by feeding with enemy life"],
             lumina: "You invoke the power of Lumina. Your hands starts glowing, and suddendly a green light accompained by a loud noise overwhelm everything. As soon as you are able to see, everything is covered in ash. Your enemies are almost dead, unable to move. You decide to not use such a tremendous power anymore",
             nolumina: "You can still recall the destruction caused by Lumina and refuse to use it again",
+        fireplayer: ["You walked on the fire and lost "," HP, but it's not a great loss"],
+        failthunder: ["Your aim with the "," spell is not very good and you missed the target"],
+        failthunderEnemy: ["The enemey tried a "," spell, but he missed the designated target"],
+        playerenemy: ["You hit the Enemy "," for "," damage"],
+        enemyenemy: ["Enemy "," hits Enemy ", " for "," damage"],
+        enemyplayer: ["Enemy "," hits you for "," damage"],
+        enemydies:["Enemy "," died"],
+        health:"You gained 50HP by collecting the enemy's crystallized blood",
         }
 }
 
@@ -67,4 +99,4 @@ function stringSwap2()
             lumina: "You invoke the power of Lumina. Your hands starts glowing, and suddendly a green light overwhelm everything. You can barely listen the screams of your enemies, burning alive in such a great power. As soon as you are able to see, everything is destroyed, burned, covered in ash. Your enemies can not move. You surely want to use this power again, but you are unable to do anything",
             nolumina: "You can still hear the screams of your enemies dying under the immense power of Lumina... but she refuses to unleash her fury again",
         }
-}
+}*/

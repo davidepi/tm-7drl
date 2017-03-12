@@ -87,8 +87,10 @@ function Actor(posx,posy,maxhp,sprite,fire,ice,thunder)
     this.tp=thunder;
 }
 
-function Npc(posx,posy,maxhp,sprite,fire,ice,thunder,ai)
+function Npc(name,posx,posy,maxhp,sprite,type,fire,thunder,ai)
 {
+    this.name = name;
+    this.aitype = type; //0 - normal, 1 = pyro, 2= escape
     this.aistatus = 1; //1 = waiting, 0 = chasing
     this.style = Math.random(0,2);
     this.position = {x:posx, y:posy};
@@ -96,11 +98,13 @@ function Npc(posx,posy,maxhp,sprite,fire,ice,thunder,ai)
     this.maxhp = maxhp;
     this.model = sprite;
     this.fp=fire;
-    this.ip=ice;
+    this.ip=0;
     this.tp=thunder;
     this.room = whichRoom(this.position.x,this.position.y);
     this.turn = Game.turn;
     this.act = ai;
+    this.escapeDirection = {escaping:0,x:0,y:0};
+    this.spell = (this.fp>this.tp || Math.random(1,10)>3)?this.fp>99?this.fp>199?"f3":"f2":"f1":this.tp>99?this.tp>199?"t3":"t2":"t1";
 }
 
 function init()
@@ -156,8 +160,11 @@ function render()
         for(var mx=initx;mx<endx;mx++)
         {
             currentTile=Game.map.tiles[my*Game.map.columns+mx];
-            if(Game.map.hidden[my*Game.map.columns+mx]==1) //undiscovered area
+            if(Game.map.hidden[my*Game.map.columns+mx]==1 && !Game.skills[15]) //undiscovered area
+            {
                 ctx.fillRect(mx*Game.tilesize+startx,my*Game.tilesize+starty,Game.tilesize,Game.tilesize);
+                continue;
+            }
             else
             {
                 ctx.drawImage(Game.spritesheet,currentTile.x,currentTile.y,Game.tilesize,Game.tilesize,mx*Game.tilesize+startx,my*Game.tilesize+starty,Game.tilesize,Game.tilesize);
@@ -732,6 +739,15 @@ function keybind(evt)
                         Game.icemultiplier = 1.0;
                         Game.thundermultiplier = 1.0;
                     }
+                    if(sselected==13)
+                    {
+                        if(Game.player.fp >= Game.player.ip && Game.player.fp >= Game.player.tp)
+                            Game.player.fp = Math.floor(Game.player.fp*1.5);
+                        else if (Game.player.ip >= Game.player.fp && Game.player.ip >= Game.player.tp)
+                            Game.player.ip = Math.floor(Game.player.ip*1.5);
+                        else if (Game.player.tp >= Game.player.fp && Game.player.tp >= Game.player.ip)
+                            Game.player.tp = Math.floor(Game.player.tp*1.5);
+                    }
                 }
                 else
                 {
@@ -802,7 +818,15 @@ function keybind(evt)
                 if(Game.skills[9]==1 && current_status==Status.MAP)
                 {
                     console.log(Strings.lumina);
-                    //TODO: process enemies
+                    Game.npcs.forEach(function(cur, index, arr)
+                        {
+                        if(cur!=undefined)
+                        {
+                            cur.curhp=1;
+                            cur.aistatus=99;
+                        }
+                        });
+
                     trigger_turn = true;
                     Game.skills[9]=2;
                     for(var i=0;i<Game.map.tiles.length;i++)
@@ -1125,13 +1149,16 @@ function keybind(evt)
 
     if(trigger_turn)
     {
-        //document.getElementById("console").innerHTML = '';
-        var current_cell_object = Game.objects[Game.player.position.y*Game.map.columns+Game.player.position.x];
-        if(current_cell_object != undefined)
+        if(!Game.skills[18] || Math.random(1,4)!=1)
+        {
+            document.getElementById("console").innerHTML = '';
+            var current_cell_object = Game.objects[Game.player.position.y*Game.map.columns+Game.player.position.x];
+            if(current_cell_object != undefined)
             current_cell_object.trigger();
-        var res = endTurn();
-        if(!res)
-            next_status = Status.DEAD;
+            var res = endTurn();
+            if(!res)
+                next_status = Status.DEAD;
+        }
         render();
     }
     Game.kstatus = next_status;
