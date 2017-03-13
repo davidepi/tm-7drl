@@ -205,9 +205,9 @@ function keybind(evt)
                 evt.preventDefault(); //suppress page scrolling
                 if(current_status == Status.MAP)
                 {
-                    if(Game.player.position.x > 0 &&
+                    if(Game.player.position.x > 0 && ((
                         Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x-1].accessible == true && 
-                        Game.npcs[Game.player.position.y*Game.map.columns+Game.player.position.x-1]==undefined)
+                        Game.npcs[Game.player.position.y*Game.map.columns+Game.player.position.x-1]==undefined)||Game.skills[14]))
                     {
                         //can't walk on ice
                         if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x-1]!=undefined && !Game.skills[6])
@@ -218,7 +218,7 @@ function keybind(evt)
                             }
 
                         var tile = Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x]; //UPDATE ROOM AND UNCOVER AREA
-                        if(tile==VDOOR || tile==BVDOOR) //update room
+                        if(tile==VDOOR || tile==BVDOOR || Game.skills[14]) //update room
                         {
                             Game.player.room = whichRoom(Game.player.position.x-1,Game.player.position.y);
                             if(Game.map.hidden[Game.player.position.y*Game.map.columns+Game.player.position.x-1]==1) //if hidden uncover area
@@ -339,8 +339,8 @@ function keybind(evt)
                 if(current_status == Status.MAP)
                 {
                     if(Game.player.position.y > 0 &&
-                        Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x].accessible == true &&
-                        Game.npcs[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x]==undefined)
+                        ((Game.map.tiles[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x].accessible == true &&
+                        Game.npcs[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x]==undefined)||Game.skills[14]))
                     {
                         //can't walk on ice
                         if(Game.overlay[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x]!=undefined && !Game.skills[6])
@@ -351,7 +351,7 @@ function keybind(evt)
                             }
 
                         var tile = Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x]; //UPDATE ROOM AND UNCOVER AREA
-                        if(tile==HDOOR || tile==BHDOOR) //update room
+                        if(tile==HDOOR || tile==BHDOOR || Game.skills[14]) //update room
                         {
                             Game.player.room = whichRoom(Game.player.position.x,Game.player.position.y-1);
                             if(Game.map.hidden[(Game.player.position.y-1)*Game.map.columns+Game.player.position.x]==1) //if hidden uncover area
@@ -439,9 +439,9 @@ function keybind(evt)
                 evt.preventDefault(); //suppress page scrolling
                 if(current_status == Status.MAP)
                 {
-                    if(Game.player.position.x > 0 &&
+                    if(Game.player.position.x < Game.map.columns-1 && ((
                         Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x+1].accessible == true && 
-                        Game.npcs[Game.player.position.y*Game.map.columns+Game.player.position.x+1]==undefined)
+                        Game.npcs[Game.player.position.y*Game.map.columns+Game.player.position.x+1]==undefined)||Game.skills[14]))
                     {
                         //can't walk on ice
                         if(Game.overlay[Game.player.position.y*Game.map.columns+Game.player.position.x+1]!=undefined && !Game.skills[6])
@@ -452,7 +452,7 @@ function keybind(evt)
                             }
 
                         var tile = Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x]; //UPDATE ROOM AND UNCOVER AREA
-                        if(tile==VDOOR || tile==BVDOOR) //update room
+                        if(tile==VDOOR || tile==BVDOOR || Game.skills[14]) //update room
                         {
                             Game.player.room = whichRoom(Game.player.position.x+1,Game.player.position.y);
                             if(Game.map.hidden[Game.player.position.y*Game.map.columns+Game.player.position.x+1]==1) //if hidden uncover area
@@ -573,9 +573,9 @@ function keybind(evt)
                 evt.preventDefault(); //suppress page scrolling
                 if(current_status == Status.MAP)
                 {
-                    if(Game.player.position.y > 0 &&
+                    if(Game.player.position.y < Game.map.rows-1 && ((
                         Game.map.tiles[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x].accessible == true &&
-                        Game.npcs[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x]==undefined)
+                        Game.npcs[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x]==undefined)||Game.skills[14]))
                     {
                         //can't walk on ice
                         if(Game.overlay[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x]!=undefined && !Game.skills[6])
@@ -586,7 +586,7 @@ function keybind(evt)
                             }
 
                         var tile = Game.map.tiles[Game.player.position.y*Game.map.columns+Game.player.position.x]; //UPDATE ROOM AND UNCOVER AREA
-                        if(tile==HDOOR || tile==BHDOOR) //update room
+                        if(tile==HDOOR || tile==BHDOOR || Game.skills[14]) //update room
                         {
                             Game.player.room = whichRoom(Game.player.position.x,Game.player.position.y+1);
                             if(Game.map.hidden[(Game.player.position.y+1)*Game.map.columns+Game.player.position.x]==1) //if hidden uncover area
@@ -676,6 +676,11 @@ function keybind(evt)
                 if(current_status == Status.MAP)
                 {
                     next_status = Status.MENU;
+                    if(!Game.map.tiles[Game.player.position.x+Game.player.position.y*Game.map.columns].accessible)
+                    {
+                        next_status = Status.MAP;
+                        break;
+                    }
                     if(Game.abilities[0])
                     {
                         document.getElementById("f1").className = "selected";
@@ -1159,6 +1164,8 @@ function keybind(evt)
             if(!res)
                 next_status = Status.DEAD;
         }
+        else
+            console.log("You borrow some time...");
         render();
     }
     Game.kstatus = next_status;

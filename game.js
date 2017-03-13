@@ -61,10 +61,13 @@ function endTurn()
     if(Game.player.curhp<1)
     {
         if(Game.skills[16]==1)
+        {
             Game.skills[16]=2;
+            Game.player.curhp = Game.player.maxhp;
+            console.log("Life Promise gives you a second chance!");
+        }
         else
         {
-            console.log("You diededed!!!")
             document.getElementById("mesg").style.display="block";
             document.getElementById("introbg").style.display="block";
             document.getElementById("mesg").innerHTML="<h1>You Died</h1><div>Refresh the page to retry</div>";
@@ -140,7 +143,7 @@ function generateMap(magnitude)
         case 4:
             {
                 Game.player.model=new Tile(false,128,0);
-                //stringSwap1();
+                stringSwap1();
                 generateBase(30,40,30,40,4);
                 document.getElementById("title").innerHTML = 'Fourth Floor';
                 break;
@@ -166,7 +169,7 @@ function generateMap(magnitude)
                 generateBase(45,55,45,55,5);
                 enableSkills(7);
                 document.getElementById("title").innerHTML = 'Seventh Floor';
-                //stringSwap2();
+                stringSwap2();
                 break;
             }
         case 8:
@@ -1347,6 +1350,14 @@ function cast()
                     if(Game.player.curhp>Game.player.maxhp)
                         Game.player.curhp=Game.player.maxhp;
                 }
+                if(Game.skills[5])
+                {
+                    Game.npcs.forEach(function(cur, index, arr)                                  
+                        {                                                                        
+                            if(cur!=undefined)                                                   
+                                cur.hp-=damage*5/100          
+                        });
+                }
                 console.log(Strings.playerenemy[0]+Game.npcs[current_pos].name+Strings.playerenemy[1]+damage+Strings.playerenemy[2]);
             }
             else
@@ -1354,11 +1365,13 @@ function cast()
         }
         if(Game.player.position.x+Game.player.position.y*Game.map.columns==current_pos)
         {
-            if(!Game.skills[4] || (Game.skills[4] && Math.random(15,100)<85))
+            if(!Game.skills[4] || (Game.skills[4] && Math.random(1,100)<85))
             {
                 Game.player.curhp -= damage;
                 console.log(Strings.enemyplayer[0]+Game.aimed[i].caster.name+Strings.enemyplayer[1]+damage+Strings.enemyplayer[2]);
             }
+            else
+                console.log("The Shield of Glyncaryn protected you");
         }
 
         switch(type.charAt(0))
